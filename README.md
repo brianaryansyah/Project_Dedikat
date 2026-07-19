@@ -58,8 +58,6 @@ Alur pemrosesan data (pipeline) dalam aplikasi DEDIKAT dirancang secara sistemat
 
 ## Struktur Repositori
 
-Susunan folder dan file di dalam repositori GitHub ini telah dirapikan agar memenuhi standar struktur proyek rekayasa perangkat lunak profesional:
-
 ```text
 ├── archive/                    # Folder arsip riwayat pelatihan & file riset lama
 │   ├── base_models/            # Berkas model YOLOv8s & YOLOv8n asli (Base weights)
