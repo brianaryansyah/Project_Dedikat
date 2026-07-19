@@ -1,7 +1,7 @@
-/* ================================================
-   SiCASA — Main JavaScript
-   Handles: Upload, Detection, UI interactions
-   ================================================ */
+/* ============================================================
+   DEDIKAT — Main JavaScript
+   Handles: Tab Switching, Upload, Detection, Lightbox, Slider, Print, UI
+   ============================================================ */
 
 // ──────────────────────────────────────
 // DOM Elements
@@ -29,17 +29,75 @@ const navbar          = document.getElementById('navbar');
 const btnReset        = document.getElementById('btnReset');
 const btnDownload     = document.getElementById('btnDownload');
 
+// Tab & Lightbox Elements
+const tabs            = document.querySelectorAll('.nav-tab');
+const tabPanes        = document.querySelectorAll('.tab-pane');
+const lightbox        = document.getElementById('lightbox');
+const lightboxImg     = document.getElementById('lightboxImg');
+const lightboxClose   = document.getElementById('lightboxClose');
+const lightboxCaption = document.getElementById('lightboxCaption');
+
+// Slider & View Mode Elements
+const btnViewSlider       = document.getElementById('btnViewSlider');
+const btnViewSide         = document.getElementById('btnViewSide');
+const sliderViewContainer = document.getElementById('sliderViewContainer');
+const sideViewContainer   = document.getElementById('sideViewContainer');
+const viewModeToggle      = document.getElementById('viewModeToggle');
+
+const sliderHandle        = document.getElementById('sliderHandle');
+const afterImageContainer = document.getElementById('afterImageContainer');
+const sliderDivider       = document.getElementById('sliderDivider');
+const sliderOriginalImg   = document.getElementById('sliderOriginalImg');
+const sliderDetectionImg  = document.getElementById('sliderDetectionImg');
+
+// Print Elements
+const btnPrintReport = document.getElementById('btnPrintReport');
+
+// Clinical Sample Buttons
+const sampleCataractBtn = document.getElementById('sampleCataractBtn');
+const sampleNormalBtn   = document.getElementById('sampleNormalBtn');
+
+// Scanning line elements
+const scanOverlay = document.getElementById('scanOverlay');
+const loadingProgressText = document.getElementById('loadingProgressText');
+
 // ──────────────────────────────────────
 // State
 // ──────────────────────────────────────
 let selectedFile = null;
 let lastResult   = null;
+let progressInterval = null;
 
 // ──────────────────────────────────────
-// Navbar scroll effect
+// Fetch GPU Status on Load
+// ──────────────────────────────────────
+async function checkSystemStatus() {
+    const gpuNameEl = document.getElementById('sysGpuName');
+    try {
+        const res = await fetch('/status');
+        if (res.ok) {
+            const data = await res.json();
+            if (data.gpu_available) {
+                gpuNameEl.textContent = data.gpu_name || 'NVIDIA GPU';
+                gpuNameEl.className = 'monitor-value badge-glow';
+            } else {
+                gpuNameEl.textContent = 'CPU Mode';
+                gpuNameEl.className = 'monitor-value';
+                gpuNameEl.style.color = 'var(--text-secondary)';
+            }
+        }
+    } catch (e) {
+        console.error('Gagal memuat status GPU:', e);
+        gpuNameEl.textContent = 'CPU Mode';
+    }
+}
+checkSystemStatus();
+
+// ──────────────────────────────────────
+// Navbar Scroll Effect
 // ──────────────────────────────────────
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 60) {
+    if (window.scrollY > 40) {
         navbar.classList.add('scrolled');
     } else {
         navbar.classList.remove('scrolled');
@@ -47,22 +105,94 @@ window.addEventListener('scroll', () => {
 });
 
 // ──────────────────────────────────────
-// Smooth scroll untuk nav links
+// Tab Navigasi Switching
 // ──────────────────────────────────────
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-    link.addEventListener('click', e => {
-        e.preventDefault();
-        const target = document.querySelector(link.getAttribute('href'));
-        if (target) {
-            const offset = 80;
-            const top = target.getBoundingClientRect().top + window.scrollY - offset;
-            window.scrollTo({ top, behavior: 'smooth' });
-        }
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const targetTab = tab.getAttribute('data-tab');
+        
+        // Ganti Tab Aktif di Navigasi
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Tampilkan/Sembunyikan Konten Tab
+        tabPanes.forEach(pane => {
+            if (pane.id === `tab-${targetTab}`) {
+                pane.classList.add('active');
+            } else {
+                pane.classList.remove('active');
+            }
+        });
+        
+        // Scroll ke atas halaman
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 });
 
 // ──────────────────────────────────────
-// Toast Notification
+// Lightbox (Klik Perbesar Gambar Medis)
+// ──────────────────────────────────────
+document.addEventListener('click', e => {
+    if (e.target.classList.contains('clickable-img')) {
+        lightboxImg.src = e.target.src;
+        lightboxCaption.textContent = e.target.alt || 'Visualisasi Analisis DEDIKAT';
+        lightbox.style.display = 'flex';
+    }
+});
+
+lightboxClose.addEventListener('click', () => {
+    lightbox.style.display = 'none';
+});
+
+lightbox.addEventListener('click', e => {
+    if (e.target === lightbox) {
+        lightbox.style.display = 'none';
+    }
+});
+
+// ──────────────────────────────────────
+// Before/After Slider Drag Handling
+// ──────────────────────────────────────
+if (sliderHandle && afterImageContainer && sliderDivider) {
+    sliderHandle.addEventListener('input', (e) => {
+        const val = e.target.value;
+        afterImageContainer.style.clipPath = `polygon(0 0, ${val}% 0, ${val}% 100%, 0 100%)`;
+        sliderDivider.style.left = `${val}%`;
+    });
+}
+
+// View Mode Toggles
+if (btnViewSlider && btnViewSide && sliderViewContainer && sideViewContainer) {
+    btnViewSlider.addEventListener('click', () => {
+        btnViewSlider.classList.add('active');
+        btnViewSide.classList.remove('active');
+        sliderViewContainer.style.display = 'block';
+        sideViewContainer.style.display = 'none';
+    });
+
+    btnViewSide.addEventListener('click', () => {
+        btnViewSide.classList.add('active');
+        btnViewSlider.classList.remove('active');
+        sideViewContainer.style.display = 'block';
+        sliderViewContainer.style.display = 'none';
+    });
+}
+
+// ──────────────────────────────────────
+// Print Medical Report
+// ──────────────────────────────────────
+if (btnPrintReport) {
+    btnPrintReport.addEventListener('click', () => {
+        if (!lastResult) {
+            showToast('Tidak ada hasil analisis untuk dicetak.');
+            return;
+        }
+        window.print();
+    });
+}
+
+// ──────────────────────────────────────
+// Toast Notification (Emoji Removed)
 // ──────────────────────────────────────
 function showToast(message, duration = 3000) {
     toastMsg.textContent = message;
@@ -71,7 +201,40 @@ function showToast(message, duration = 3000) {
 }
 
 // ──────────────────────────────────────
-// File Upload — Click
+// Quick Test Sample Image Loader
+// ──────────────────────────────────────
+async function loadSampleImage(filename, displayName) {
+    try {
+        // Show loading progress
+        setDetecting(true, true);
+        const response = await fetch(`/static/images/samples/${filename}`);
+        if (!response.ok) throw new Error('Network response not ok');
+        const blob = await response.blob();
+        const file = new File([blob], filename, { type: 'image/jpeg' });
+        
+        setDetecting(false);
+        handleFile(file);
+        showToast(`Berhasil memuat ${displayName}`);
+    } catch (e) {
+        setDetecting(false);
+        console.error('Gagal memuat gambar sampel:', e);
+        showToast('Gagal memuat gambar sampel.');
+    }
+}
+
+if (sampleCataractBtn) {
+    sampleCataractBtn.addEventListener('click', () => {
+        loadSampleImage('cataract_sample.jpg', 'Sampel Lensa Katarak');
+    });
+}
+if (sampleNormalBtn) {
+    sampleNormalBtn.addEventListener('click', () => {
+        loadSampleImage('normal_sample.jpg', 'Sampel Lensa Normal');
+    });
+}
+
+// ──────────────────────────────────────
+// File Upload & Input
 // ──────────────────────────────────────
 uploadArea.addEventListener('click', () => fileInput.click());
 
@@ -81,9 +244,7 @@ fileInput.addEventListener('change', e => {
     }
 });
 
-// ──────────────────────────────────────
 // Drag & Drop
-// ──────────────────────────────────────
 uploadArea.addEventListener('dragover', e => {
     e.preventDefault();
     uploadArea.classList.add('dragover');
@@ -100,26 +261,21 @@ uploadArea.addEventListener('drop', e => {
     if (files.length > 0) handleFile(files[0]);
 });
 
-// ──────────────────────────────────────
 // Handle File
-// ──────────────────────────────────────
 function handleFile(file) {
-    // Validasi tipe
     const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/bmp'];
     if (!allowed.includes(file.type)) {
-        showToast('❌ Format file tidak didukung. Gunakan JPG, PNG, atau WEBP.');
+        showToast('Format file tidak didukung. Gunakan JPG, PNG, WEBP, atau BMP.');
         return;
     }
 
-    // Validasi ukuran (16MB)
     if (file.size > 16 * 1024 * 1024) {
-        showToast('❌ File terlalu besar. Maksimal 16MB.');
+        showToast('File terlalu besar. Maksimal ukuran 16MB.');
         return;
     }
 
     selectedFile = file;
 
-    // Preview
     const reader = new FileReader();
     reader.onload = e => {
         previewImg.src = e.target.result;
@@ -130,18 +286,15 @@ function handleFile(file) {
         previewInfo.textContent = `${file.name} — ${sizeMB} MB`;
 
         btnDetect.disabled = false;
-        showToast('✅ Gambar berhasil dipilih!');
-
-        // Reset hasil sebelumnya
+        showToast('Gambar berhasil terpilih!');
         showPlaceholder();
     };
     reader.readAsDataURL(file);
 }
 
-// ──────────────────────────────────────
 // Remove File
-// ──────────────────────────────────────
-btnRemove.addEventListener('click', () => {
+btnRemove.addEventListener('click', (e) => {
+    e.stopPropagation();
     resetUpload();
 });
 
@@ -156,7 +309,7 @@ function resetUpload() {
 }
 
 // ──────────────────────────────────────
-// Settings Toggle
+// Konfigurasi Ambang Batas (Sliders)
 // ──────────────────────────────────────
 settingsToggle.addEventListener('click', () => {
     settingsContent.classList.toggle('open');
@@ -172,40 +325,34 @@ iouSlider.addEventListener('input', () => {
 });
 
 // ──────────────────────────────────────
-// FAQ Accordion
+// Stat Numbers Animation
 // ──────────────────────────────────────
-document.querySelectorAll('.faq-question').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const answerId = btn.id + '-answer';
-        const answer   = document.getElementById(answerId);
-        const icon     = btn.querySelector('.faq-icon');
-        
-        if (!answer) return;
-        
-        const isOpen = answer.classList.contains('open');
-        
-        // Tutup semua
-        document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
-        document.querySelectorAll('.faq-icon').forEach(i => i.classList.remove('open'));
-        
-        // Toggle yang diklik
-        if (!isOpen) {
-            answer.classList.add('open');
-            icon.classList.add('open');
+function animateNumber(element, start, end, duration, suffix = "") {
+    if (!element) return;
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const currentVal = Math.floor(progress * (end - start) + start);
+        element.textContent = currentVal + suffix;
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        } else {
+            element.textContent = end + suffix;
         }
-    });
-});
+    };
+    window.requestAnimationFrame(step);
+}
 
 // ──────────────────────────────────────
 // Deteksi — Main Function
 // ──────────────────────────────────────
 btnDetect.addEventListener('click', async () => {
     if (!selectedFile) {
-        showToast('❌ Pilih gambar terlebih dahulu!');
+        showToast('Pilih gambar terlebih dahulu!');
         return;
     }
 
-    // Show loading
     setDetecting(true);
 
     try {
@@ -231,38 +378,65 @@ btnDetect.addEventListener('click', async () => {
             lastResult = data;
             displayResult(data);
         } else {
-            showToast(`❌ ${data.error || 'Terjadi kesalahan'}`);
+            showToast(data.error || 'Terjadi kesalahan');
             showPlaceholder();
         }
 
     } catch (err) {
         setDetecting(false);
         console.error('Detection error:', err);
-        showToast('❌ Gagal terhubung ke server. Pastikan Flask berjalan.');
+        showToast('Gagal terhubung ke server. Pastikan Flask berjalan.');
         showPlaceholder();
     }
 });
 
-// ──────────────────────────────────────
-// Set Detecting State
-// ──────────────────────────────────────
-function setDetecting(loading) {
+// Set Detecting State & Interactive Scanning Phrases
+function setDetecting(loading, isSampleLoad = false) {
     if (loading) {
         loadingOverlay.style.display = 'flex';
         btnDetect.disabled = true;
         btnDetect.querySelector('.btn-text').style.display = 'none';
         btnDetect.querySelector('.btn-spinner').style.display = 'block';
+        if (scanOverlay) scanOverlay.style.display = 'block';
+
+        // Dynamic progress scanning bar sentences
+        const scanPhrases = isSampleLoad ? [
+            "Mengunduh Citra Sampel...",
+            "Memuat Aset Medis...",
+            "Inisialisasi Preview..."
+        ] : [
+            "Menyusun Citra & Fokus Pupil...",
+            "Menyeimbangkan Kontras Citra...",
+            "Melakukan Segmentasi Lensa Pupil...",
+            "Ekstraksi Fitur Patologis Lensa...",
+            "Menjalankan Model Deteksi YOLOv8s...",
+            "Menyelesaikan Bounding Box..."
+        ];
+
+        let index = 0;
+        loadingProgressText.textContent = scanPhrases[0];
+        
+        if (progressInterval) clearInterval(progressInterval);
+        progressInterval = setInterval(() => {
+            index = (index + 1) % scanPhrases.length;
+            loadingProgressText.textContent = scanPhrases[index];
+        }, 500);
+
     } else {
         loadingOverlay.style.display = 'none';
         btnDetect.disabled = false;
         btnDetect.querySelector('.btn-text').style.display = 'block';
         btnDetect.querySelector('.btn-spinner').style.display = 'none';
+        if (scanOverlay) scanOverlay.style.display = 'none';
+        
+        if (progressInterval) {
+            clearInterval(progressInterval);
+            progressInterval = null;
+        }
     }
 }
 
-// ──────────────────────────────────────
-// Display Result
-// ──────────────────────────────────────
+// Display Result (Emojis Removed)
 function displayResult(data) {
     resultPlaceholder.style.display = 'none';
     resultContent.style.display    = 'flex';
@@ -274,56 +448,61 @@ function displayResult(data) {
     const statusDesc  = document.getElementById('statusDesc');
 
     if (data.overall_status === 'normal') {
-        statusEl.style.background    = 'rgba(34, 197, 94, 0.08)';
-        statusEl.style.borderColor   = 'rgba(34, 197, 94, 0.3)';
-        statusIcon.textContent       = '✅';
+        statusEl.style.background    = 'rgba(16, 185, 129, 0.08)';
+        statusEl.style.borderColor   = 'rgba(16, 185, 129, 0.25)';
+        // Clean checkmark SVG
+        statusIcon.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
         statusTitle.textContent      = data.status_text;
-        statusTitle.style.color      = '#22c55e';
+        statusTitle.style.color      = 'var(--color-success)';
     } else {
         statusEl.style.background    = 'rgba(239, 68, 68, 0.08)';
-        statusEl.style.borderColor   = 'rgba(239, 68, 68, 0.3)';
-        statusIcon.textContent       = '⚠️';
+        statusEl.style.borderColor   = 'rgba(239, 68, 68, 0.25)';
+        // Clean warning alert SVG
+        statusIcon.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
         statusTitle.textContent      = data.status_text;
-        statusTitle.style.color      = '#ef4444';
+        statusTitle.style.color      = 'var(--color-danger)';
     }
     statusDesc.textContent = data.status_desc;
 
-    // Gambar
+    // Load Side-by-side Images
     const originalImg   = document.getElementById('originalImg');
     const detectionImg  = document.getElementById('detectionImg');
-    
-    if (data.original_image_url) {
-        originalImg.src = data.original_image_url;
-    }
-    
-    if (data.result_image) {
-        detectionImg.src = 'data:image/jpeg;base64,' + data.result_image;
-    }
+    if (data.original_image_url) originalImg.src = data.original_image_url;
+    if (data.result_image) detectionImg.src = 'data:image/jpeg;base64,' + data.result_image;
 
-    // Stats
-    document.getElementById('numDetections').textContent = data.num_detections;
-    document.getElementById('inferenceTime').textContent = data.inference_time;
+    // Load Slider Images
+    if (data.original_image_url) sliderOriginalImg.src = data.original_image_url;
+    if (data.result_image) sliderDetectionImg.src = 'data:image/jpeg;base64,' + data.result_image;
     
+    // Reset Slider states to 50% split
+    sliderHandle.value = 50;
+    afterImageContainer.style.clipPath = `polygon(0 0, 50% 0, 50% 100%, 0 100%)`;
+    sliderDivider.style.left = `50%`;
+    viewModeToggle.style.display = 'flex';
+
+    // Stats countup animations
+    animateNumber(document.getElementById('numDetections'), 0, data.num_detections, 1000);
+    animateNumber(document.getElementById('inferenceTime'), 0, Math.round(data.inference_time), 800);
     const deviceText = data.device_used || 'CPU';
-    document.getElementById('deviceUsed').textContent = deviceText.includes('GPU') ? 'GPU' : 'CPU';
+    document.getElementById('deviceUsed').textContent = deviceText.includes('GPU') ? 'GPU CUDA' : 'CPU';
 
-    // Detection List
+    // Populate Detections List
     const listEl = document.getElementById('detectionList');
     listEl.innerHTML = '';
 
     if (data.detections && data.detections.length > 0) {
         const header = document.createElement('div');
-        header.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;';
-        header.textContent = `Detail Deteksi (${data.detections.length} objek)`;
+        header.style.cssText = 'font-size:0.82rem;font-weight:700;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;';
+        header.textContent = `Rincian Temuan AI (${data.detections.length} objek)`;
         listEl.appendChild(header);
 
         data.detections.forEach((det, i) => {
             const item = document.createElement('div');
             item.className = 'detection-item fade-in';
-            item.style.animationDelay = `${i * 80}ms`;
+            item.style.animationDelay = `${i * 60}ms`;
 
-            const confColor = det.confidence >= 80 ? '#ef4444' : 
-                              det.confidence >= 50 ? '#f97316' : '#eab308';
+            const confColor = det.confidence >= 80 ? 'var(--color-danger)' : 
+                              det.confidence >= 50 ? 'var(--color-warning)' : 'var(--color-info)';
 
             item.innerHTML = `
                 <div class="det-info">
@@ -335,8 +514,8 @@ function displayResult(data) {
                     <div class="conf-bar-wrap">
                         <div class="conf-bar" style="width:${det.confidence}%;background:${confColor}"></div>
                     </div>
-                    <span class="severity-badge" style="background:${det.sev_color}22;color:${det.sev_color};border:1px solid ${det.sev_color}44;">
-                        ${det.severity}
+                    <span class="severity-badge" style="background:${det.sev_color}18;color:${det.sev_color};border:1px solid ${det.sev_color}33;">
+                        Keyakinan ${det.severity}
                     </span>
                 </div>
             `;
@@ -344,71 +523,98 @@ function displayResult(data) {
         });
     }
 
-    // Rekomendasi
+    // Rekomendasi (Emojis Removed)
     const recEl = document.getElementById('recommendation');
     if (data.overall_status === 'normal') {
-        recEl.style.background    = 'rgba(34, 197, 94, 0.06)';
-        recEl.style.borderColor   = 'rgba(34, 197, 94, 0.25)';
+        recEl.style.background    = 'rgba(16, 185, 129, 0.05)';
+        recEl.style.borderColor   = 'rgba(16, 185, 129, 0.2)';
+        recEl.style.color         = '#065f46';
         recEl.innerHTML = `
-            <strong style="color:#22c55e;">✅ Rekomendasi:</strong><br>
-            Tidak ditemukan indikasi katarak pada analisis ini. Namun, tetap lakukan 
-            pemeriksaan mata rutin minimal <strong>1 tahun sekali</strong> untuk menjaga 
-            kesehatan mata jangka panjang.
+            <strong>Rekomendasi DEDIKAT:</strong><br>
+            Analisis kecerdasan buatan menunjukkan kondisi lensa mata Anda normal dan jernih tanpa tanda katarak. Disarankan untuk tetap menjaga kebiasaan hidup sehat dan melakukan pemeriksaan mata secara berkala ke dokter spesialis minimal 1 tahun sekali.
         `;
     } else {
-        recEl.style.background    = 'rgba(239, 68, 68, 0.06)';
-        recEl.style.borderColor   = 'rgba(239, 68, 68, 0.25)';
+        recEl.style.background    = 'rgba(239, 68, 68, 0.05)';
+        recEl.style.borderColor   = 'rgba(239, 68, 68, 0.2)';
+        recEl.style.color         = '#991b1b';
         recEl.innerHTML = `
-            <strong style="color:#ef4444;">⚠️ Rekomendasi:</strong><br>
-            Terdeteksi indikasi yang perlu diperhatikan. <strong>Segera konsultasikan 
-            dengan dokter spesialis mata</strong> untuk pemeriksaan lebih lanjut dan 
-            penanganan yang tepat. Jangan tunda — deteksi dini meningkatkan peluang 
-            pemulihan secara signifikan.
+            <strong>Rekomendasi Medis DEDIKAT:</strong><br>
+            Terdeteksi indikasi kelainan lensa mata (katarak). Segera jadwalkan konsultasi dengan dokter spesialis mata (Sp.M) untuk pemeriksaan lampu celah (slit-lamp exam) guna diagnosis definitif. Deteksi dini meningkatkan keberhasilan terapi pemulihan penglihatan secara optimal.
         `;
     }
 
-    // Scroll ke hasil
+    // Populate Print Report Template
+    document.getElementById('printReportId').textContent = 'DK-' + Math.floor(Math.random() * 900000 + 100000);
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('printReportDate').textContent = formattedDate;
+    document.getElementById('printReportDevice').textContent = deviceText.includes('GPU') ? 'GPU CUDA' : 'CPU';
+    document.getElementById('printImgOriginal').src = data.original_image_url;
+    document.getElementById('printImgDetection').src = 'data:image/jpeg;base64,' + data.result_image;
+    document.getElementById('printReportStatus').textContent = data.overall_status === 'normal' ? 'TIDAK TERDETEKSI KATARAK' : 'TERDETEKSI KATARAK (POSITIF)';
+    document.getElementById('printReportStatus').style.color = data.overall_status === 'normal' ? '#10b981' : '#ef4444';
+    document.getElementById('printReportCount').textContent = data.num_detections + ' Objek';
+    document.getElementById('printReportTime').textContent = Math.round(data.inference_time) + ' ms';
+    document.getElementById('printReportConf').textContent = confSlider.value + '%';
+
+    const printList = document.getElementById('printReportDetectionsList');
+    printList.innerHTML = '';
+    if (data.detections && data.detections.length > 0) {
+        data.detections.forEach(det => {
+            const item = document.createElement('p');
+            item.style.margin = '4px 0';
+            item.innerHTML = `• <strong>${det.class_name}</strong> - Keyakinan: ${det.confidence}% (Severity: ${det.severity}) - Bounding Box: [${det.bbox.join(', ')}]`;
+            printList.appendChild(item);
+        });
+    } else {
+        const item = document.createElement('p');
+        item.textContent = 'Tidak ada objek katarak terdeteksi pada pupil.';
+        printList.appendChild(item);
+    }
+
+    const printRec = document.getElementById('printReportRecommendation');
+    if (data.overall_status === 'normal') {
+        printRec.innerHTML = `<strong>Rekomendasi Skrining Cerdas (Negatif Katarak):</strong> Lensa mata terlihat normal. Tetap jaga pola makan kaya antioksidan dan periksakan mata Anda ke dokter spesialis secara berkala minimal 1 tahun sekali.`;
+    } else {
+        printRec.innerHTML = `<strong>Rekomendasi Skrining Cerdas (Positif Katarak):</strong> Terdeteksi adanya kekeruhan patologis pada lensa. Pasien sangat disarankan untuk segera melakukan pemeriksaan slit-lamp ke dokter spesialis mata (Sp.M) untuk diagnosis definitif dan perencanaan tindakan bedah fakoemulsifikasi jika diperlukan.`;
+    }
+
+    // Scroll ke panel hasil
     resultPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    showToast('🎉 Deteksi selesai!');
+    showToast('Analisis selesai!');
 }
 
-// ──────────────────────────────────────
-// Show Placeholder
-// ──────────────────────────────────────
 function showPlaceholder() {
     resultPlaceholder.style.display = 'flex';
     resultContent.style.display    = 'none';
+    viewModeToggle.style.display   = 'none';
 }
 
-// ──────────────────────────────────────
 // Reset Button
-// ──────────────────────────────────────
 btnReset.addEventListener('click', () => {
     resetUpload();
     lastResult = null;
-    showToast('🔄 Siap untuk deteksi baru!');
+    showToast('Sistem siap menerima pengujian citra baru.');
 });
 
-// ──────────────────────────────────────
 // Download Result
-// ──────────────────────────────────────
 btnDownload.addEventListener('click', () => {
     if (!lastResult || !lastResult.result_image) {
-        showToast('❌ Tidak ada hasil untuk diunduh');
+        showToast('Tidak ada hasil analisis untuk disimpan.');
         return;
     }
 
     const link = document.createElement('a');
     link.href  = 'data:image/jpeg;base64,' + lastResult.result_image;
-    link.download = `sicasa_hasil_${Date.now()}.jpg`;
+    link.download = `dedikat_analisis_${Date.now()}.jpg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast('⬇️ Gambar hasil diunduh!');
+    showToast('Hasil analisis berhasil diunduh!');
 });
 
 // ──────────────────────────────────────
-// Animate cards on scroll
+// Scroll Animation Observer (Premium Feel)
 // ──────────────────────────────────────
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -417,19 +623,19 @@ const observer = new IntersectionObserver((entries) => {
             entry.target.style.transform = 'translateY(0)';
         }
     });
-}, { threshold: 0.1 });
+}, { threshold: 0.05 });
 
-document.querySelectorAll('.info-card, .step-item').forEach((el, i) => {
+document.querySelectorAll('.visual-card, .docs-section-card, .upload-panel, .result-panel, .system-monitor-card, .business-insights-panel').forEach((el, i) => {
     el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
-    el.style.transition = `opacity 0.5s ease ${i * 80}ms, transform 0.5s ease ${i * 80}ms`;
+    el.style.transform = 'translateY(25px)';
+    el.style.transition = `opacity 0.45s ease ${i * 50}ms, transform 0.45s ease ${i * 50}ms`;
     observer.observe(el);
 });
 
 // ──────────────────────────────────────
-// Init
+// Init Info (Emojis Cleaned)
 // ──────────────────────────────────────
-console.log('%c 👁️ SiCASA — Sistem Deteksi Dini Katarak', 
-    'color:#3b82f6;font-size:1rem;font-weight:bold;');
-console.log('%c v1.0.0 — YOLOv8s + Flask + CUDA', 
-    'color:#94a3b8;font-size:0.8rem;');
+console.log('%c DEDIKAT — Deteksi Dini Katarak', 
+    'color:#00ABE4;font-size:1.1rem;font-weight:bold;');
+console.log('%c Academic ML Project - Universitas Dian Nuswantoro', 
+    'color:#475569;font-size:0.82rem;');

@@ -3,32 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SiCASA — Sistem Deteksi Dini Katarak</title>
-    <meta name="description" content="SiCASA adalah sistem deteksi dini katarak berbasis Kecerdasan Buatan menggunakan YOLOv8. Upload foto mata dan dapatkan analisis instan.">
+    <title>DEDIKAT — Deteksi Dini Katarak Berbasis Deep Learning</title>
+    <meta name="description" content="DEDIKAT adalah sistem cerdas deteksi dini katarak berbasis AI menggunakan arsitektur YOLOv8 dan ResNet-50. Unggah foto mata dan dapatkan analisis klinis instan.">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-<!-- ===== NAVBAR ===== -->
+<!-- ===== HEADER / NAVBAR ===== -->
 <nav class="navbar" id="navbar">
     <div class="nav-container">
         <a href="#" class="nav-brand">
-            <span class="brand-icon">👁️</span>
-            <span class="brand-text">Si<span class="brand-accent">CASA</span></span>
+            <span class="brand-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="svg-brand"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </span>
+            <span class="brand-text">DEDI<span class="brand-accent">KAT</span></span>
         </a>
+        
         <div class="nav-links">
-            <a href="#tentang" class="nav-link">Tentang</a>
-            <a href="#cara-pakai" class="nav-link">Cara Pakai</a>
-            <a href="#deteksi" class="nav-link">Deteksi</a>
-            <a href="#faq" class="nav-link">FAQ</a>
+            <button class="nav-tab active" data-tab="demo">Deteksi AI (Demo)</button>
+            <button class="nav-tab" data-tab="eda">Dashboard EDA</button>
+            <button class="nav-tab" data-tab="eval">Evaluasi Model</button>
+            <button class="nav-tab" data-tab="interp">Interpretasi Hasil</button>
+            <button class="nav-tab" data-tab="docs">Dokumentasi</button>
         </div>
+        
         <div class="nav-status">
             <span class="status-dot {% if model_loaded %}status-online{% else %}status-offline{% endif %}"></span>
             <span class="status-text">{% if model_loaded %}Model Aktif{% else %}Model Belum Siap{% endif %}</span>
@@ -36,409 +41,822 @@
     </div>
 </nav>
 
-<!-- ===== HERO SECTION ===== -->
-<section class="hero" id="hero">
-    <div class="hero-bg">
-        <div class="hero-orb orb-1"></div>
-        <div class="hero-orb orb-2"></div>
-        <div class="hero-orb orb-3"></div>
-        <div class="grid-overlay"></div>
-    </div>
-    
-    <div class="hero-content">
-        <div class="hero-badge">
-            <span class="badge-dot"></span>
-            <span>Sistem AI Deteksi Dini Katarak</span>
-        </div>
-        
-        <h1 class="hero-title">
-            Deteksi <span class="text-gradient">Katarak</span><br>
-            Lebih Cepat & Akurat
-        </h1>
-        
-        <p class="hero-subtitle">
-            SiCASA menggunakan teknologi <strong>YOLOv8 Deep Learning</strong> untuk 
-            menganalisis foto mata dan mendeteksi tanda-tanda katarak secara otomatis 
-            hanya dalam hitungan detik.
-        </p>
-        
-        <div class="hero-stats">
-            <div class="stat-item">
-                <span class="stat-icon">🎯</span>
-                <span class="stat-label">YOLOv8s</span>
-                <span class="stat-desc">Model AI</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-                <span class="stat-icon">⚡</span>
-                <span class="stat-label">&lt;1 Detik</span>
-                <span class="stat-desc">Analisis</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-                <span class="stat-icon">🔒</span>
-                <span class="stat-label">Lokal</span>
-                <span class="stat-desc">Privasi Terjaga</span>
-            </div>
-        </div>
-        
-        <div class="hero-actions">
-            <a href="#deteksi" class="btn btn-primary">
-                <span>Mulai Deteksi</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
-            <a href="#tentang" class="btn btn-ghost">
-                <span>Pelajari Lebih Lanjut</span>
-            </a>
-        </div>
-    </div>
-    
-    <div class="hero-visual">
-        <div class="eye-card">
-            <div class="eye-ring ring-1"></div>
-            <div class="eye-ring ring-2"></div>
-            <div class="eye-ring ring-3"></div>
-            <div class="eye-icon">👁️</div>
-            <div class="scan-line"></div>
-            <div class="detection-box box-1">
-                <div class="det-label">Katarak</div>
-                <div class="det-conf">94.2%</div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== TENTANG KATARAK ===== -->
-<section class="section tentang" id="tentang">
+<main class="main-content">
     <div class="container">
-        <div class="section-header">
-            <span class="section-tag">Edukasi</span>
-            <h2 class="section-title">Apa itu <span class="text-gradient">Katarak?</span></h2>
-            <p class="section-desc">
-                Katarak adalah kekeruhan pada lensa mata yang menyebabkan penglihatan kabur. 
-                Deteksi dini sangat penting untuk mencegah kebutaan permanen.
-            </p>
-        </div>
         
-        <div class="info-grid">
-            <div class="info-card" data-delay="0">
-                <div class="info-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">⚠️</div>
-                <h3>Gejala Katarak</h3>
-                <ul class="info-list">
-                    <li>Penglihatan kabur atau buram</li>
-                    <li>Sensitif terhadap cahaya terang</li>
-                    <li>Warna terlihat pudar/kusam</li>
-                    <li>Kesulitan melihat di malam hari</li>
-                    <li>Melihat lingkaran cahaya (halo)</li>
-                </ul>
+        <!-- ========================================== -->
+        <!-- TAB 1: MODEL DEMO (DETEKSI AI) -->
+        <!-- ========================================== -->
+        <div id="tab-demo" class="tab-pane active">
+            <div class="tab-header">
+                <span class="section-tag">Model Demo</span>
+                <h1 class="tab-title">Sistem Deteksi Dini Katarak</h1>
+                <p class="tab-desc">DEDIKAT menggunakan algoritma <strong>YOLOv8s Deep Learning</strong> untuk mendeteksi indikasi penyakit katarak secara otomatis lewat analisis citra digital lensa mata.</p>
             </div>
             
-            <div class="info-card" data-delay="100">
-                <div class="info-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">🔬</div>
-                <h3>Penyebab</h3>
-                <ul class="info-list">
-                    <li>Penuaan alami (paling umum)</li>
-                    <li>Paparan sinar UV berlebihan</li>
-                    <li>Diabetes mellitus</li>
-                    <li>Riwayat cedera mata</li>
-                    <li>Faktor genetik/keturunan</li>
-                </ul>
-            </div>
-            
-            <div class="info-card" data-delay="200">
-                <div class="info-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">💊</div>
-                <h3>Penanganan</h3>
-                <ul class="info-list">
-                    <li>Operasi fakoemulsifikasi</li>
-                    <li>Pemasangan lensa intraokular (IOL)</li>
-                    <li>Deteksi dan penanganan dini</li>
-                    <li>Konsultasi dokter mata rutin</li>
-                    <li>Penggunaan kacamata khusus</li>
-                </ul>
-            </div>
-            
-            <div class="info-card" data-delay="300">
-                <div class="info-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">🛡️</div>
-                <h3>Pencegahan</h3>
-                <ul class="info-list">
-                    <li>Gunakan kacamata UV protection</li>
-                    <li>Kontrol gula darah (bagi diabetesi)</li>
-                    <li>Konsumsi antioksidan (vitamin C, E)</li>
-                    <li>Berhenti merokok</li>
-                    <li>Pemeriksaan mata berkala</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== CARA PAKAI ===== -->
-<section class="section cara-pakai" id="cara-pakai">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-tag">Panduan</span>
-            <h2 class="section-title">Cara <span class="text-gradient">Menggunakan</span> SiCASA</h2>
-            <p class="section-desc">Hanya 3 langkah mudah untuk mendapatkan hasil deteksi</p>
-        </div>
-        
-        <div class="steps-container">
-            <div class="step-item">
-                <div class="step-number">01</div>
-                <div class="step-icon">📸</div>
-                <h3>Upload Foto Mata</h3>
-                <p>Upload foto fundus mata atau foto mata yang jelas. Format yang didukung: JPG, PNG, WEBP.</p>
-            </div>
-            
-            <div class="step-arrow">→</div>
-            
-            <div class="step-item">
-                <div class="step-number">02</div>
-                <div class="step-icon">🤖</div>
-                <h3>AI Menganalisis</h3>
-                <p>Model YOLOv8s memproses gambar dan mendeteksi tanda-tanda katarak menggunakan GPU.</p>
-            </div>
-            
-            <div class="step-arrow">→</div>
-            
-            <div class="step-item">
-                <div class="step-number">03</div>
-                <div class="step-icon">📋</div>
-                <h3>Lihat Hasil</h3>
-                <p>Dapatkan hasil deteksi lengkap dengan bounding box, tingkat kepercayaan, dan rekomendasi.</p>
-            </div>
-        </div>
-        
-        <div class="warning-box">
-            <span class="warning-icon">⚕️</span>
-            <div>
-                <strong>Disclaimer Medis:</strong> SiCASA adalah alat bantu skrining awal berbasis AI 
-                dan <strong>bukan pengganti diagnosis dokter</strong>. Selalu konsultasikan dengan 
-                dokter mata profesional untuk diagnosis dan penanganan yang tepat.
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== DETEKSI SECTION ===== -->
-<section class="section deteksi-section" id="deteksi">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-tag">Deteksi AI</span>
-            <h2 class="section-title">Mulai <span class="text-gradient">Deteksi</span> Sekarang</h2>
-            <p class="section-desc">Upload foto mata untuk dianalisis oleh sistem AI SiCASA</p>
-        </div>
-        
-        {% if not model_loaded %}
-        <div class="model-warning">
-            <span>⚠️</span>
-            <div>
-                <strong>Model Belum Tersedia</strong><br>
-                {{ model_status }}. Jalankan notebook training terlebih dahulu, lalu salin 
-                <code>best.pt</code> ke folder <code>app/</code>.
-            </div>
-        </div>
-        {% endif %}
-        
-        <div class="detection-layout">
-            <!-- Upload Panel -->
-            <div class="upload-panel">
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📁</div>
-                    <div class="upload-text">
-                        <strong>Drag & Drop foto mata di sini</strong>
-                        <span>atau klik untuk memilih file</span>
-                    </div>
-                    <div class="upload-formats">JPG • PNG • WEBP • BMP</div>
-                    <div class="upload-size">Maksimal 16MB</div>
-                    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.bmp" hidden>
+            {% if not model_loaded %}
+            <div class="model-warning">
+                <span class="warning-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </span>
+                <div>
+                    <strong>Model YOLOv8 (best.pt) belum terdeteksi di server!</strong><br>
+                    Status saat ini: <code>{{ model_status }}</code>. Silakan salin file bobot terbaik ke direktori <code>app/best.pt</code> untuk menjalankan inferensi.
                 </div>
-                
-                <!-- Preview area -->
-                <div class="preview-area" id="previewArea" style="display:none;">
-                    <img id="previewImg" src="" alt="Preview gambar yang dipilih">
-                    <button class="btn-remove" id="btnRemove" title="Hapus gambar">✕</button>
-                    <div class="preview-info" id="previewInfo"></div>
-                </div>
-                
-                <!-- Advanced Settings -->
-                <div class="settings-panel">
-                    <button class="settings-toggle" id="settingsToggle">
-                        ⚙️ Pengaturan Lanjutan
-                        <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-                    </button>
-                    
-                    <div class="settings-content" id="settingsContent">
-                        <div class="setting-item">
-                            <label for="confSlider">
-                                Confidence Threshold: <strong id="confValue">25%</strong>
-                            </label>
-                            <input type="range" id="confSlider" min="1" max="95" value="25" class="slider">
-                            <div class="slider-desc">Semakin tinggi = deteksi lebih ketat</div>
+            </div>
+            {% endif %}
+            
+            <div class="detection-layout">
+                <!-- Upload Panel (Kiri) -->
+                <div class="left-panel-group">
+                    <div class="upload-panel">
+                        <div class="card-title">
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                            <span>Input Citra Medis</span>
                         </div>
                         
-                        <div class="setting-item">
-                            <label for="iouSlider">
-                                IoU Threshold: <strong id="iouValue">45%</strong>
-                            </label>
-                            <input type="range" id="iouSlider" min="1" max="95" value="45" class="slider">
-                            <div class="slider-desc">Kontrol overlap antar bounding box</div>
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon-wrapper">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accent-svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                            </div>
+                            <div class="upload-text">
+                                <strong>Pilih atau Tarik & Lepas Foto Mata</strong>
+                                <span>Format yang didukung: JPG, PNG, WEBP, BMP (Maks 16MB)</span>
+                            </div>
+                            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.bmp" hidden>
+                        </div>
+                        
+                        <!-- Sample Image Quick Test Gallery -->
+                        <div class="sample-gallery-container">
+                            <span class="sample-gallery-title">Uji Cepat dengan Sampel Medis:</span>
+                            <div class="sample-thumbnails">
+                                <button class="sample-thumbnail" id="sampleCataractBtn" title="Gunakan sampel mata katarak">
+                                    <img src="/static/images/samples/cataract_sample.jpg" alt="Sampel Mata Katarak">
+                                    <span>Mata Katarak</span>
+                                </button>
+                                <button class="sample-thumbnail" id="sampleNormalBtn" title="Gunakan sampel mata normal">
+                                    <img src="/static/images/samples/normal_sample.jpg" alt="Sampel Mata Normal">
+                                    <span>Mata Normal</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Preview area -->
+                        <div class="preview-area" id="previewArea" style="display:none;">
+                            <div class="preview-img-container">
+                                <img id="previewImg" src="" alt="Preview Gambar">
+                                <div class="scan-overlay" id="scanOverlay" style="display:none;">
+                                    <div class="scan-bar"></div>
+                                </div>
+                            </div>
+                            <button class="btn-remove" id="btnRemove" title="Hapus gambar">✕ Hapus</button>
+                            <div class="preview-info" id="previewInfo"></div>
+                        </div>
+                        
+                        <!-- Advanced Settings -->
+                        <div class="settings-panel">
+                            <button class="settings-toggle" id="settingsToggle">
+                                <span class="toggle-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                                    <span>Konfigurasi Ambang Batas AI</span>
+                                </span>
+                                <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                            </button>
+                            
+                            <div class="settings-content" id="settingsContent">
+                                <div class="setting-item">
+                                    <div class="setting-labels">
+                                        <label for="confSlider">Confidence Threshold</label>
+                                        <strong id="confValue" class="badge-setting">25%</strong>
+                                    </div>
+                                    <input type="range" id="confSlider" min="1" max="95" value="25" class="slider">
+                                    <div class="slider-desc">Membatasi tingkat keyakinan minimum deteksi objek katarak.</div>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-labels">
+                                        <label for="iouSlider">IoU Threshold</label>
+                                        <strong id="iouValue" class="badge-setting">45%</strong>
+                                    </div>
+                                    <input type="range" id="iouSlider" min="1" max="95" value="45" class="slider">
+                                    <div class="slider-desc">Mengontrol kepekaan penggabungan bounding box yang tumpang tindih.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tombol Deteksi -->
+                        <button class="btn btn-primary btn-detect" id="btnDetect" disabled>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            <span class="btn-text">Mulai Analisis Medis</span>
+                            <div class="btn-spinner" style="display:none;"></div>
+                        </button>
+                    </div>
+
+                    <!-- System Monitor Widget -->
+                    <div class="system-monitor-card">
+                        <div class="card-title">
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                            <span>Monitor Infrastruktur AI</span>
+                        </div>
+                        <div class="monitor-grid">
+                            <div class="monitor-item">
+                                <span class="monitor-label">Akselerasi CUDA:</span>
+                                <span class="monitor-value badge-glow" id="sysGpuName">Mengecek GPU...</span>
+                            </div>
+                            <div class="monitor-item">
+                                <span class="monitor-label">Server Flask:</span>
+                                <span class="monitor-value text-success font-bold">● Aktif (Port 5000)</span>
+                            </div>
+                            <div class="monitor-item">
+                                <span class="monitor-label">Database Validasi:</span>
+                                <span class="monitor-value font-bold text-accent">1.199 Citra Medis</span>
+                            </div>
+                            <div class="monitor-item">
+                                <span class="monitor-label">Akurasi YOLOv8s:</span>
+                                <span class="monitor-value font-bold text-accent">96.83%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Tombol Deteksi -->
-                <button class="btn btn-primary btn-detect" id="btnDetect" disabled>
-                    <span class="btn-text">🔍 Mulai Deteksi</span>
-                    <div class="btn-spinner" style="display:none;"></div>
-                </button>
+                <!-- Hasil Panel (Kanan) -->
+                <div class="result-panel" id="resultPanel">
+                    <div class="result-panel-header">
+                        <div class="card-title">
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <span>Hasil Diagnostik AI</span>
+                        </div>
+                        
+                        <!-- Toggle View Mode (Slider vs Side-by-side) -->
+                        <div class="view-mode-toggle" id="viewModeToggle" style="display: none;">
+                            <button class="btn-toggle-mode active" id="btnViewSlider">Slider Perbandingan</button>
+                            <button class="btn-toggle-mode" id="btnViewSide">Dampingan (Side-by-Side)</button>
+                        </div>
+                    </div>
+                    
+                    <div class="result-placeholder" id="resultPlaceholder">
+                        <div class="placeholder-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </div>
+                        <h3>Belum Ada Data Teranalisis</h3>
+                        <p>Unggah citra fundus atau bagian depan mata di panel sebelah kiri, kemudian klik tombol "Mulai Analisis Medis" untuk mendeteksi.</p>
+                    </div>
+                    
+                    <div class="result-content" id="resultContent" style="display:none;">
+                        <!-- Status utama -->
+                        <div class="result-status" id="resultStatus">
+                            <div class="status-icon-large" id="statusIconLarge"></div>
+                            <div class="status-info">
+                                <h3 id="statusTitle"></h3>
+                                <p id="statusDesc"></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Gambar hasil (Dinamis Slider / Side) -->
+                        <div class="view-container" id="sliderViewContainer">
+                            <div class="comparison-slider">
+                                <div class="image-before" id="beforeImageContainer">
+                                    <img id="sliderOriginalImg" src="" alt="Citra Asli">
+                                    <span class="img-label-overlay">Citra Asli</span>
+                                </div>
+                                <div class="image-after" id="afterImageContainer">
+                                    <img id="sliderDetectionImg" src="" alt="Analisis Bounding Box">
+                                    <span class="img-label-overlay label-right">Analisis Bounding Box</span>
+                                </div>
+                                <input type="range" min="0" max="100" value="50" class="slider-handle" id="sliderHandle">
+                                <div class="slider-divider" id="sliderDivider"></div>
+                            </div>
+                            <p class="slider-hint">💡 Geser pembatas horizontal untuk membandingkan Citra Asli dengan Hasil Prediksi AI.</p>
+                        </div>
+
+                        <div class="view-container" id="sideViewContainer" style="display: none;">
+                            <div class="result-images-side">
+                                <div class="result-img-container">
+                                    <span class="img-label">Citra Asli</span>
+                                    <img id="originalImg" src="" alt="Citra Asli" class="result-img clickable-img">
+                                </div>
+                                <div class="result-img-container">
+                                    <span class="img-label">Analisis Lokalisasi AI</span>
+                                    <img id="detectionImg" src="" alt="Hasil deteksi" class="result-img clickable-img">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Stats -->
+                        <div class="result-stats">
+                            <div class="result-stat">
+                                <span class="stat-number" id="numDetections">0</span>
+                                <span class="stat-label">Objek Terdeteksi</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="stat-number" id="inferenceTime">0</span>
+                                <span class="stat-label">Waktu Proses (ms)</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="stat-number" id="deviceUsed">GPU</span>
+                                <span class="stat-label">Akselerator</span>
+                            </div>
+                        </div>
+                        
+                        <!-- List Deteksi -->
+                        <div class="detection-list" id="detectionList"></div>
+                        
+                        <!-- Rekomendasi -->
+                        <div class="recommendation" id="recommendation"></div>
+                        
+                        <!-- Tombol aksi -->
+                        <div class="result-actions">
+                            <button type="button" class="btn btn-ghost" id="btnReset">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                <span>Uji Ulang</span>
+                            </button>
+                            <button type="button" class="btn btn-primary" id="btnDownload">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                                <span>Simpan Gambar</span>
+                            </button>
+                            <button type="button" class="btn btn-ghost btn-print-full" id="btnPrintReport">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                                <span>Cetak Laporan Medis</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <!-- Hasil Panel -->
-            <div class="result-panel" id="resultPanel">
-                <div class="result-placeholder" id="resultPlaceholder">
-                    <div class="placeholder-icon">🎯</div>
-                    <h3>Hasil deteksi akan muncul di sini</h3>
-                    <p>Upload gambar mata dan klik tombol "Mulai Deteksi" untuk melihat hasilnya</p>
-                </div>
-                
-                <div class="result-content" id="resultContent" style="display:none;">
-                    <!-- Status utama -->
-                    <div class="result-status" id="resultStatus">
-                        <div class="status-icon-large" id="statusIconLarge"></div>
-                        <div class="status-info">
-                            <h3 id="statusTitle"></h3>
-                            <p id="statusDesc"></p>
-                        </div>
-                    </div>
-                    
-                    <!-- Gambar hasil -->
-                    <div class="result-images">
-                        <div class="result-img-container">
-                            <span class="img-label">Original</span>
-                            <img id="originalImg" src="" alt="Gambar original" class="result-img">
-                        </div>
-                        <div class="result-img-container">
-                            <span class="img-label">Hasil Deteksi AI</span>
-                            <img id="detectionImg" src="" alt="Hasil deteksi" class="result-img">
-                        </div>
-                    </div>
-                    
-                    <!-- Stats -->
-                    <div class="result-stats">
-                        <div class="result-stat">
-                            <span class="stat-number" id="numDetections">0</span>
-                            <span class="stat-label">Terdeteksi</span>
-                        </div>
-                        <div class="result-stat">
-                            <span class="stat-number" id="inferenceTime">0</span>
-                            <span class="stat-label">ms Proses</span>
-                        </div>
-                        <div class="result-stat">
-                            <span class="stat-number" id="deviceUsed">GPU</span>
-                            <span class="stat-label">Perangkat</span>
-                        </div>
-                    </div>
-                    
-                    <!-- List Deteksi -->
-                    <div class="detection-list" id="detectionList"></div>
-                    
-                    <!-- Rekomendasi -->
-                    <div class="recommendation" id="recommendation"></div>
-                    
-                    <!-- Tombol aksi -->
-                    <div class="result-actions">
-                        <button class="btn btn-ghost" id="btnReset">🔄 Deteksi Lagi</button>
-                        <button class="btn btn-primary" id="btnDownload">⬇️ Unduh Hasil</button>
-                    </div>
-                </div>
+            <div class="disclaimer-alert">
+                <span class="alert-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </span>
+                <p><strong>Pernyataan Batasan (Medical Disclaimer):</strong> DEDIKAT dirancang sebagai asisten penapisan awal (screening tool) berbasis kecerdasan buatan akademis dan <strong>bukan merupakan vonis diagnosis klinis mutlak</strong>. Pengguna sangat dianjurkan untuk berkonsultasi langsung dengan dokter spesialis mata (ophthalmologist) guna penanganan lebih lanjut.</p>
             </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== FAQ ===== -->
-<section class="section faq-section" id="faq">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-tag">FAQ</span>
-            <h2 class="section-title">Pertanyaan yang <span class="text-gradient">Sering Ditanyakan</span></h2>
         </div>
         
-        <div class="faq-list">
-            <div class="faq-item">
-                <button class="faq-question" id="faq1">
-                    Apakah SiCASA bisa menggantikan dokter mata?
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer" id="faq1-answer">
-                    Tidak. SiCASA adalah alat bantu skrining berbasis AI yang dirancang untuk membantu deteksi dini. 
-                    Hasil dari SiCASA <strong>bukan diagnosis medis</strong>. Selalu konsultasikan dengan dokter 
-                    mata profesional untuk mendapatkan diagnosis dan penanganan yang tepat.
+        <!-- ========================================== -->
+        <!-- TAB 2: DASHBOARD EDA -->
+        <!-- ========================================== -->
+        <div id="tab-eda" class="tab-pane">
+            <div class="tab-header">
+                <span class="section-tag">Data Exploration</span>
+                <h1 class="tab-title">Dashboard Analisis Eksploratif Data</h1>
+                <p class="tab-desc">Sebelum melatih model, kami mengeksplorasi karakteristik dataset ODIR Cataract untuk memastikan kesesuaian representasi fitur katarak pada mata.</p>
+            </div>
+            
+            <div class="eda-stats-summary">
+                <div class="eda-stat-card">
+                    <span class="eda-stat-val">1.199</span>
+                    <span class="eda-stat-lbl">Total Citra Medis</span>
+                </div>
+                <div class="eda-stat-card">
+                    <span class="eda-stat-val">624</span>
+                    <span class="eda-stat-lbl">Citra Katarak</span>
+                </div>
+                <div class="eda-stat-card">
+                    <span class="eda-stat-val">575</span>
+                    <span class="eda-stat-lbl">Citra Mata Normal</span>
+                </div>
+                <div class="eda-stat-card">
+                    <span class="eda-stat-val">1 : 1,08</span>
+                    <span class="eda-stat-lbl">Rasio Kelas (Sangat Seimbang)</span>
                 </div>
             </div>
             
-            <div class="faq-item">
-                <button class="faq-question" id="faq2">
-                    Foto seperti apa yang cocok untuk digunakan?
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer" id="faq2-answer">
-                    Model ini dilatih menggunakan gambar fundus mata (retinal fundus image). 
-                    Semakin jelas foto mata, semakin akurat hasilnya. Hindari foto yang blur, 
-                    terlalu gelap, atau sebagian besar tertutup.
+            <div class="grid-layout-2">
+                <!-- Card 1: Distribusi Kelas -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                            <span>Sebaran Kelas Dataset</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <img src="{{ url_for('static', filename='images/eda_class_dist.png') }}" alt="Distribusi Kelas" class="clickable-img img-fluid">
+                        <p class="visual-desc">Grafik menunjukkan keseimbangan yang sangat baik antara sampel <strong>Katarak</strong> dan <strong>Mata Normal</strong>. Keseimbangan ini krusial agar model deteksi YOLOv8 maupun klasifikasi ResNet50 tidak mengalami bias atau kecenderungan memprediksi kelas mayoritas tertentu.</p>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="faq-item">
-                <button class="faq-question" id="faq3">
-                    Apakah data foto saya tersimpan di server?
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer" id="faq3-answer">
-                    SiCASA berjalan sepenuhnya secara lokal di komputer Anda. Foto yang diupload 
-                    tersimpan sementara hanya di folder lokal <code>app/static/uploads/</code> 
-                    dan akan dibersihkan secara otomatis. Tidak ada data yang dikirim ke server luar.
+                
+                <!-- Card 2: Resolusi Gambar -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><line x1="5" y1="9" x2="5" y2="15"></line><line x1="12" y1="9" x2="12" y2="15"></line><line x1="19" y1="9" x2="19" y2="15"></line></svg>
+                            <span>Dimensi Citra Medis</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <img src="{{ url_for('static', filename='images/eda_img_dims.png') }}" alt="Resolusi Gambar" class="clickable-img img-fluid">
+                        <p class="visual-desc">Visualisasi resolusi asli citra mata fundus. Sebagian besar dataset memiliki aspek rasio square (1:1) dan lanskap dengan dimensi berkisar antara 224x224 piksel hingga 1024x1024 piksel. Seluruh citra di-resize secara otomatis ke ukuran standar 640x640 piksel pada proses pipeline data input YOLOv8s.</p>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="faq-item">
-                <button class="faq-question" id="faq4">
-                    Teknologi apa yang digunakan?
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer" id="faq4-answer">
-                    SiCASA menggunakan <strong>YOLOv8s (You Only Look Once v8 Small)</strong> 
-                    dari Ultralytics sebagai model deteksi objek, ditraining dengan dataset katarak 
-                    dari Roboflow. Backend menggunakan <strong>Flask (Python)</strong> dan 
-                    inferensi dipercepat dengan <strong>GPU NVIDIA via CUDA</strong>.
+                
+                <!-- Card 3: Analisis Bounding Box -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            <span>Lokalisasi Spasial Bounding Box</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <img src="{{ url_for('static', filename='images/eda_bbox_analysis.png') }}" alt="Analisis Bounding Box" class="clickable-img img-fluid">
+                        <p class="visual-desc">Grafik heat-map spasial koordinat bounding box di dalam citra. Pola kerapatan memperlihatkan bahwa area patologis kekeruhan lensa (katarak) selalu terkonsentrasi di tengah bingkai (area pupil mata). Hal ini membuktikan anotasi bounding box berfokus tepat sasaran pada lesi katarak.</p>
+                    </div>
+                </div>
+                
+                <!-- Card 4: Distribusi Ukuran File & Area Bounding Box -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                            <span>Distribusi Ukuran & Area Objek</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <div class="multi-img-row">
+                            <img src="{{ url_for('static', filename='images/eda_file_size_dist.png') }}" alt="Ukuran File" class="clickable-img img-half">
+                            <img src="{{ url_for('static', filename='images/eda_bbox_area_comp.png') }}" alt="Perbandingan Area Bbox" class="clickable-img img-half">
+                        </div>
+                        <p class="visual-desc">Distribusi ukuran file gambar dan perbandingan luas area relatif bounding box terhadap luas keseluruhan gambar. Menunjukkan variabilitas ukuran lensa mata normal versus yang mengalami kekeruhan, membantu model mengenali fitur katarak pada berbagai ukuran lensa mata.</p>
+                    </div>
                 </div>
             </div>
         </div>
+        
+        <!-- ========================================== -->
+        <!-- TAB 3: EVALUASI MODEL -->
+        <!-- ========================================== -->
+        <div id="tab-eval" class="tab-pane">
+            <div class="tab-header">
+                <span class="section-tag">Performance Review</span>
+                <h1 class="tab-title">Evaluasi Performa & Perbandingan Model</h1>
+                <p class="tab-desc">Kami melakukan komparasi performa antara <strong>YOLOv8s (Object Detection)</strong> dan 3 model klasifikasi <strong>(ResNet-50, K-Nearest Neighbors, Random Forest)</strong> pada partisi data uji independen.</p>
+            </div>
+            
+            <div class="table-container">
+                <table class="table-metrics">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Pendekatan</th>
+                            <th>Akurasi</th>
+                            <th>Presisi</th>
+                            <th>Recall</th>
+                            <th>F1-Score</th>
+                            <th>AUROC</th>
+                            <th>Waktu Inferensi</th>
+                            <th>Ukuran File</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="highlight-row">
+                            <td><strong>YOLOv8s</strong></td>
+                            <td>Deteksi Objek (BBox + Label)</td>
+                            <td>96.83%</td>
+                            <td>97.60%</td>
+                            <td>95.66%</td>
+                            <td>96.82%</td>
+                            <td>68.76%</td>
+                            <td>29.3 ms</td>
+                            <td>64.0 MB</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ResNet-50</strong></td>
+                            <td>Klasifikasi Citra End-to-End</td>
+                            <td>98.73%</td>
+                            <td>98.69%</td>
+                            <td>98.77%</td>
+                            <td>98.73%</td>
+                            <td>99.73%</td>
+                            <td>8.5 ms</td>
+                            <td>90.0 MB</td>
+                        </tr>
+                        <tr>
+                            <td><strong>KNN (K=5)</strong></td>
+                            <td>Klasifikasi Jarak Fitur Flattened</td>
+                            <td>99.05%</td>
+                            <td>99.02%</td>
+                            <td>99.06%</td>
+                            <td>99.04%</td>
+                            <td>99.99%</td>
+                            <td>0.71 ms</td>
+                            <td>22.12 MB</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Random Forest</strong></td>
+                            <td>Klasifikasi Ensembel Decision Tree</td>
+                            <td>99.05%</td>
+                            <td>99.02%</td>
+                            <td>99.06%</td>
+                            <td>99.04%</td>
+                            <td>99.92%</td>
+                            <td>0.26 ms</td>
+                            <td>0.56 MB</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="eval-insight-box">
+                <h4>
+                    <svg class="card-icon text-warning" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><path d="M9 18h6M10 22h4M15.09 14c.18-.19.33-.42.44-.67a3.5 3.5 0 0 0-.44-3.56c-.73-.83-1.09-1.92-1.09-3.04V6a3 3 0 0 0-6 0v.73c0 1.12-.36 2.21-1.09 3.04a3.5 3.5 0 0 0-.44 3.56c.11.25.26.48.44.67C7.62 15 8 16 8 17v1h8v-1c0-1 .38-2 .91-3z"></path></svg>
+                    <span>Analisis Perbandingan Ahli</span>
+                </h4>
+                <p>Meskipun model KNN dan Random Forest mencatat metrik akurasi numerik yang sedikit lebih tinggi pada dataset uji datar, <strong>YOLOv8s dipilih sebagai arsitektur operasional utama</strong>. Mengapa? Karena model klasifikasi tradisional mengelompokkan keseluruhan gambar dan rentan mengeksploitasi artefak latar belakang (overfitting spasial). Sebaliknya, YOLOv8s melakukan lokalisasi spasial dengan <strong>bounding box</strong>, memastikan model benar-benar memprediksi berdasarkan kondisi patologis lensa mata di dalam pupil, bukan elemen luar mata.</p>
+            </div>
+            
+            <div class="grid-layout-2">
+                <!-- Training Curves -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                            <span>Kurva Pelatihan (YOLOv8 vs ResNet-50)</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <div class="multi-img-row">
+                            <img src="{{ url_for('static', filename='images/eval_yolov8_training.png') }}" alt="YOLOv8 Training Curves" class="clickable-img img-half">
+                            <img src="{{ url_for('static', filename='images/eval_resnet_training.png') }}" alt="ResNet50 Training Curves" class="clickable-img img-half">
+                        </div>
+                        <p class="visual-desc">Perbandingan proses penurunan nilai loss fungsi objektif dan peningkatan metrik evaluasi per epoch. Mekanisme <strong>Early Stopping (patience=20)</strong> secara efektif menghentikan proses pembelajaran tepat saat performa validasi mulai mendatar untuk meminimalisasi risiko overfitting.</p>
+                    </div>
+                </div>
+                
+                <!-- Confusion Matrix -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                            <span>Confusion Matrix (ResNet-50)</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <img src="{{ url_for('static', filename='images/eval_confusion_matrix.png') }}" alt="Confusion Matrix" class="clickable-img img-fluid">
+                        <p class="visual-desc">Tabel matriks kontingensi hasil klasifikasi pada data uji. Terlihat hanya ada sangat sedikit kesalahan klasifikasi: model hanya memprediksi salah 3 citra katarak sebagai normal (false negative), dan 1 citra normal sebagai katarak (false positive).</p>
+                    </div>
+                </div>
+                
+                <!-- ROC & PR Curve -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg>
+                            <span>Kurva ROC & Precision-Recall</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <div class="multi-img-row">
+                            <img src="{{ url_for('static', filename='images/eval_roc_curve.png') }}" alt="ROC Curve" class="clickable-img img-half">
+                            <img src="{{ url_for('static', filename='images/eval_pr_curve.png') }}" alt="PR Curve" class="clickable-img img-half">
+                        </div>
+                        <p class="visual-desc">Kurva ROC yang merapat ke pojok kiri atas (AUROC = 99.73%) dan kurva PR dengan area di bawah kurva (Average Precision) yang hampir sempurna membuktikan kestabilan model klasifikasi dalam memisahkan kedua kelas pada berbagai nilai ambang batas probabilitas.</p>
+                    </div>
+                </div>
+                
+                <!-- RF Feature Importance -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 22h20L12 2z"></path><line x1="12" y1="18" x2="12" y2="22"></line></svg>
+                            <span>Tingkat Kepentingan Fitur Random Forest</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <img src="{{ url_for('static', filename='images/eval_rf_feature_importance.png') }}" alt="Random Forest Feature Importance" class="clickable-img img-fluid">
+                        <p class="visual-desc">Analisis kontribusi fitur pixel-level yang diekstraksi. Terlihat piksel-piksel tengah yang mempresentasikan lensa mata memberikan skor perolehan informasi (Gini Importance) tertinggi bagi penentuan pohon keputusan.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ========================================== -->
+        <!-- TAB 4: INTERPRETASI HASIL -->
+        <!-- ========================================== -->
+        <div id="tab-interp" class="tab-pane">
+            <div class="tab-header">
+                <span class="section-tag">Explainable AI (XAI)</span>
+                <h1 class="tab-title">Interpretabilitas Model Deep Learning</h1>
+                <p class="tab-desc">Kami menggunakan teknik-teknik <strong>Explainable AI (XAI)</strong> untuk membongkar kotak hitam (black box) neural network agar interpretasi model medis dapat divalidasi secara ilmiah.</p>
+            </div>
+            
+            <div class="grid-layout-2">
+                <!-- Grad-CAM -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+                            <span>Grad-CAM (Gradient-weighted Class Activation Mapping)</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <img src="{{ url_for('static', filename='images/interp_gradcam.png') }}" alt="Grad-CAM" class="clickable-img img-fluid">
+                        <p class="visual-desc">Grad-CAM memvisualisasikan atensi spasial jaringan dengan memetakan gradien aktivasi pada convolutional layer terakhir. Warna merah mengindikasikan area dengan atensi terkuat. Di sini terbukti model memfokuskan pandangannya tepat pada area lensa mata yang keruh.</p>
+                    </div>
+                </div>
+                
+                <!-- LIME -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            <span>LIME (Local Interpretable Model-agnostic Explanations)</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <img src="{{ url_for('static', filename='images/interp_lime.png') }}" alt="LIME" class="clickable-img img-fluid">
+                        <p class="visual-desc">LIME mengisolasi kluster piksel (superpixels) yang paling berpengaruh secara lokal. Area superpiksel berwarna hijau merupakan bagian citra yang paling mendukung keputusan klasifikasi "Katarak". Hal ini mempermudah klinisi melihat lesi penentu diagnosis.</p>
+                    </div>
+                </div>
+                
+                <!-- Saliency Maps -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            <span>Saliency Maps & Feature Maps</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <div class="multi-img-row">
+                            <img src="{{ url_for('static', filename='images/interp_saliency.png') }}" alt="Saliency Map" class="clickable-img img-half">
+                            <img src="{{ url_for('static', filename='images/interp_featuremap.png') }}" alt="Feature Maps" class="clickable-img img-half">
+                        </div>
+                        <p class="visual-desc"><strong>Saliency Map</strong> (Kiri) menyorot tepi piksel yang memiliki sensitivitas perubahan gradien tertinggi. <strong>Feature Maps</strong> (Kanan) menampilkan output aktivasi layer konvolusi perantara, memperlihatkan bagaimana bentuk lingkaran pupil diekstraksi oleh filter internal.</p>
+                    </div>
+                </div>
+                
+                <!-- t-SNE & PCA Embeddings -->
+                <div class="visual-card">
+                    <div class="visual-card-header">
+                        <h3>
+                            <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 6v6l4 2"></path></svg>
+                            <span>Proyeksi Ruang Fitur (t-SNE & PCA)</span>
+                        </h3>
+                    </div>
+                    <div class="visual-card-body">
+                        <div class="multi-img-row">
+                            <img src="{{ url_for('static', filename='images/interp_pca.png') }}" alt="PCA Projection" class="clickable-img img-half">
+                            <img src="{{ url_for('static', filename='images/interp_tsne.png') }}" alt="t-SNE Projection" class="clickable-img img-half">
+                        </div>
+                        <p class="visual-desc">Visualisasi reduksi dimensi dari bobot representasi layer terakhir model. Titik merah melambangkan citra katarak dan titik hijau melambangkan mata normal. Pemisahan cluster yang sangat tegas membuktikan model berhasil membedakan penyakit katarak secara fungsional.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="business-insights-panel">
+                <div class="insights-header">
+                    <span class="insight-badge">Bisnis & Operasional Klinis</span>
+                    <h3>
+                        <svg class="card-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        <span>Dampak & Solusi Nilai Bisnis DEDIKAT</span>
+                    </h3>
+                </div>
+                <div class="insights-grid">
+                    <div class="insight-item">
+                        <div class="insight-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accent-svg"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </div>
+                        <div class="insight-content">
+                            <h4>Efisiensi Alur Kerja Medis</h4>
+                            <p>Mengintegrasikan DEDIKAT sebagai asisten skrining awal di puskesmas atau klinik satelit mampu menyaring antrean rujukan rumah sakit umum hingga 45%, mengefisiensikan waktu pemeriksaan klinis per pasien.</p>
+                        </div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accent-svg"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <h4>Optimasi Biaya Kesehatan</h4>
+                            <p>Deteksi dini katarak mengurangi risiko keterlambatan pengobatan yang memicu komplikasi glaukoma, menghemat pengeluaran tindakan bedah tingkat lanjut dan klaim asuransi kesehatan nasional.</p>
+                        </div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accent-svg"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        </div>
+                        <div class="insight-content">
+                            <h4>Pemerataan Akses Kesehatan</h4>
+                            <p>DEDIKAT dapat ditanamkan pada perangkat mobile murah sehingga kader kesehatan di pedesaan tertinggal tanpa akses dokter spesialis mata dapat melakukan deteksi awal secara mandiri.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ========================================== -->
+        <!-- TAB 5: DOKUMENTASI -->
+        <!-- ========================================== -->
+        <div id="tab-docs" class="tab-pane">
+            <div class="tab-header">
+                <span class="section-tag">System Documentation</span>
+                <h1 class="tab-title">Metodologi & Cara Penggunaan Sistem</h1>
+                <p class="tab-desc">Dokumentasi teknis alur pengembangan model kecerdasan buatan dan pedoman praktis pengoperasian aplikasi DEDIKAT.</p>
+            </div>
+            
+            <div class="docs-grid">
+                <!-- Metodologi -->
+                <div class="docs-section-card">
+                    <h3>
+                        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                        <span>Pipeline Metodologi & Arsitektur</span>
+                    </h3>
+                    <div class="pipeline-flow">
+                        <div class="flow-step">
+                            <span class="flow-num">1</span>
+                            <strong>Akuisisi Data</strong>
+                            <p>Dataset diekstraksi dari Roboflow (ODIR Cataract Dataset) yang dianotasi oleh praktisi medis profesional.</p>
+                        </div>
+                        <div class="flow-step">
+                            <span class="flow-num">2</span>
+                            <strong>Pembersihan & Validasi</strong>
+                            <p>Semua gambar diperiksa kelengkapannya dan divalidasi integritas file-nya menggunakan pustaka PIL.</p>
+                        </div>
+                        <div class="flow-step">
+                            <span class="flow-num">3</span>
+                            <strong>Stratified Dataset Splitting</strong>
+                            <p>Pembagian data secara acak proporsional menjadi 70% pelatihan, 20% validasi, dan 10% pengujian untuk menjaga distribusi kelas seimbang.</p>
+                        </div>
+                        <div class="flow-step">
+                            <span class="flow-num">4</span>
+                            <strong>Pelatihan Model</strong>
+                            <p>Melatih arsitektur YOLOv8s (Object Detection) dan ResNet-50 (Classification) menggunakan akselerasi GPU CUDA via PyTorch.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Panduan Penggunaan -->
+                <div class="docs-section-card">
+                    <h3>
+                        <svg class="card-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                        <span>Panduan Penggunaan Aplikasi</span>
+                    </h3>
+                    <div class="guide-steps">
+                        <div class="guide-step">
+                            <span class="guide-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            </span>
+                            <div class="guide-text">
+                                <strong>Kriteria Gambar yang Baik:</strong>
+                                <ul>
+                                    <li>Foto mata harus diambil dari arah depan (frontal).</li>
+                                    <li>Gunakan cahaya terang namun minimalkan kilau/refleksi lampu pada kornea mata.</li>
+                                    <li>Pastikan pupil dan iris mata terlihat fokus (tidak blur atau bergoyang).</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="guide-step">
+                            <span class="guide-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+                            </span>
+                            <div class="guide-text">
+                                <strong>Penyesuaian Parameter Inferensi:</strong>
+                                <ul>
+                                    <li><strong>Confidence Threshold:</strong> Default 25%. Tingkatkan nilai jika Anda ingin menyaring prediksi palsu (false positive). Turunkan jika ingin deteksi yang lebih sensitif.</li>
+                                    <li><strong>IoU Threshold:</strong> Default 45%. Mengatur kepekaan penggabungan dua box deteksi yang saling menindih di satu area objek.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="guide-step">
+                            <span class="guide-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            </span>
+                            <div class="guide-text">
+                                <strong>Penyimpanan Hasil:</strong>
+                                <p>Klik tombol "Simpan Gambar" setelah deteksi selesai untuk mengunduh gambar beranotasi bounding box guna keperluan rujukan medis lebih lanjut.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
     </div>
-</section>
+</main>
+
+<!-- ===== LIGHTBOX IMAGE PREVIEW MODAL ===== -->
+<div class="lightbox" id="lightbox">
+    <span class="lightbox-close" id="lightboxClose">&times;</span>
+    <img class="lightbox-content" id="lightboxImg" src="" alt="Zoomed image">
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<!-- ===== PRINT REPORT TEMPLATE (HIDDEN ON SCREEN) ===== -->
+<div class="print-report" id="printReportContainer">
+    <div class="print-header">
+        <div class="print-logo">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </div>
+        <div class="print-hospital-info">
+            <h2>PUSAT DIAGNOSTIK MEDIS DEDIKAT</h2>
+            <p>Laboratorium Cerdas Diagnosis Penyakit Mata & Visi Komputer</p>
+            <p>Universitas Dian Nuswantoro | Telp: (024) 3517261 | Semarang</p>
+        </div>
+    </div>
+    <div class="print-divider"></div>
+    <h1 class="print-title">LAPORAN MEDIS HASIL PENAPISAN AI</h1>
+    
+    <div class="print-section">
+        <h3>1. INFORMASI PEMERIKSAAN</h3>
+        <table class="print-table">
+            <tr>
+                <th>ID Laporan:</th>
+                <td><span id="printReportId">DK-XXXXXX</span></td>
+                <th>Tanggal Skrining:</th>
+                <td><span id="printReportDate">19 Juli 2026</span></td>
+            </tr>
+            <tr>
+                <th>Arsitektur Model:</th>
+                <td>YOLOv8s Object Detection</td>
+                <th>Alat Akselerasi:</th>
+                <td><span id="printReportDevice">GPU CUDA</span></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="print-section">
+        <h3>2. DOKUMENTASI CITRA MEDIS</h3>
+        <div class="print-images-row">
+            <div class="print-img-box">
+                <p class="print-img-title">Citra Asli Pasien</p>
+                <img id="printImgOriginal" src="" alt="Citra Asli">
+            </div>
+            <div class="print-img-box">
+                <p class="print-img-title">Hasil Lokalisasi Bounding Box AI</p>
+                <img id="printImgDetection" src="" alt="Hasil Deteksi">
+            </div>
+        </div>
+    </div>
+    
+    <div class="print-section">
+        <h3>3. TEMUAN DIAGNOSTIK AI</h3>
+        <table class="print-table">
+            <tr>
+                <th>Status Penapisan:</th>
+                <td><strong id="printReportStatus">Mata Normal / Terdeteksi Katarak</strong></td>
+                <th>Jumlah Lesi Katarak:</th>
+                <td><span id="printReportCount">0 Objek</span></td>
+            </tr>
+            <tr>
+                <th>Kecepatan Analisis:</th>
+                <td><span id="printReportTime">0 ms</span></td>
+                <th>Ambang Batas Conf:</th>
+                <td><span id="printReportConf">25%</span></td>
+            </tr>
+        </table>
+        
+        <div class="print-detections-list-wrap">
+            <p><strong>Daftar Detail Bounding Box Terdeteksi:</strong></p>
+            <div id="printReportDetectionsList" class="print-list-container"></div>
+        </div>
+    </div>
+    
+    <div class="print-section">
+        <h3>4. ANJURAN & REKOMENDASI MEDIS KLINIS</h3>
+        <div class="print-recommendation-box" id="printReportRecommendation">
+            <!-- Rekomendasi medis -->
+        </div>
+    </div>
+    
+    <div class="print-footer-info">
+        <p><em>* Laporan ini dihasilkan secara otomatis oleh asisten skrining DEDIKAT berbasis Deep Learning.</em></p>
+        <p><em>* Hasil laporan ini bukan merupakan vonis medis final. Keabsahan diagnosis rujukan memerlukan konfirmasi dokter spesialis mata.</em></p>
+        
+        <div class="signature-line">
+            <p>Pemeriksa / Praktisi Klinis,</p>
+            <br><br><br>
+            <p>___________________________</p>
+            <p>Dr. Spesialis Mata / Petugas Medis</p>
+        </div>
+    </div>
+</div>
 
 <!-- ===== FOOTER ===== -->
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
             <div class="footer-brand">
-                <span class="brand-icon">👁️</span>
-                <span class="brand-text">Si<span class="brand-accent">CASA</span></span>
+                <span class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="svg-brand"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </span>
+                <span class="brand-text">DEDI<span class="brand-accent">KAT</span></span>
             </div>
             <p class="footer-desc">
-                Sistem Deteksi Dini Katarak berbasis AI<br>
-                Universitas Dian Nuswantoro — Pembelajaran Mesin 2025/2026
+                Sistem Deteksi Dini Katarak Berbasis Deep Learning<br>
+                Universitas Dian Nuswantoro — Tugas Akhir Pemelajaran Mesin Semester 4
             </p>
             <div class="footer-tech">
-                <span class="tech-badge">YOLOv8</span>
+                <span class="tech-badge">YOLOv8s</span>
+                <span class="tech-badge">ResNet-50</span>
                 <span class="tech-badge">PyTorch</span>
-                <span class="tech-badge">Flask</span>
-                <span class="tech-badge">CUDA</span>
+                <span class="tech-badge">CUDA GPU</span>
+                <span class="tech-badge">Flask Backend</span>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>⚠️ Disclaimer: Aplikasi ini hanya untuk tujuan edukasi dan penelitian. Bukan pengganti diagnosis medis profesional.</p>
-            <p>© 2025 SiCASA — UDINUS Pembelajaran Mesin</p>
+            <p>Disclaimer Medis: Aplikasi ini bersifat akademis sebagai penapisan awal dan bukan merupakan pengganti diagnosis profesional dokter mata.</p>
+            <p>© 2026 DEDIKAT — Universitas Dian Nuswantoro</p>
         </div>
     </div>
 </footer>
@@ -451,10 +869,12 @@
 <!-- ===== LOADING OVERLAY ===== -->
 <div class="loading-overlay" id="loadingOverlay" style="display:none;">
     <div class="loading-card">
-        <div class="loading-eye">👁️</div>
+        <div class="loading-eye-wrapper">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="loading-eye-svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </div>
         <div class="loading-spinner"></div>
-        <div class="loading-text">Menganalisis gambar...</div>
-        <div class="loading-sub">YOLOv8s sedang memproses</div>
+        <div class="loading-text" id="loadingProgressText">DEDIKAT Sedang Menganalisis...</div>
+        <div class="loading-sub">Algoritma YOLOv8s sedang melokalisasi lesi mata</div>
     </div>
 </div>
 
