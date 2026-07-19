@@ -1,37 +1,199 @@
-# SiCASA — CataractScan: Pipeline Deteksi Katarak dengan YOLOv8
+# DEDIKAT: Deteksi Dini Penyakit Katarak Berbasis Analisis Citra Retina Digital
 
-**Proyek:** Sistem Deteksi Dini Katarak (SiCASA)  
-**Model:** YOLOv8 Object Detection  
-**Dataset:** ODIR Cataract (Roboflow)  
-**Kelas:** 2 — `Cataract` (0), `Normal` (1)  
-**Author:** Brian  
-**Environment:** `sicasa_gpu` (Anaconda + CUDA)  
-
-Sistem Deteksi Dini Katarak (SiCASA) adalah sebuah proyek visi komputer yang dikembangkan untuk mendeteksi katarak secara otomatis dari citra medis dengan cepat dan akurat. Proyek ini mengimplementasikan model deteksi objek mutakhir YOLOv8 yang dilatih menggunakan dataset ODIR Cataract untuk membedakan antara kondisi mata normal dan yang terindikasi katarak. Seluruh tahapan dalam pipeline proyek ini telah dirancang secara sistematis mulai dari persiapan dan pembersihan data hingga ke tahap deployment. Hasil akhir dari proyek ini adalah sebuah aplikasi web interaktif yang memungkinkan pengguna untuk melakukan skrining deteksi dini secara mandiri.
+> **Proyek Akhir Praktikum Pemelajaran Mesin (Semester 4) — Universitas Dian Nuswantoro (UDINUS)**
+> 
+> * **Nama**: Brian Aryansyah Pamungkas
+> * **NIM**: A11.2024.15880
+> * **Kelompok**: A11.4405
+> * **Dosen Pengampu / Reviewer**: Tim Dosen Pemelajaran Mesin UDINUS
 
 ---
 
-### Progress dan Pipeline End-to-End
+## 📝 Deskripsi Proyek
 
-Berikut adalah rincian tahapan capaian dalam pengembangan proyek ini beserta deskripsi cara kerjanya:
-
-| Tahap | Deskripsi & Cara Kerja |
-|:-----:|:---------|
-| **1** | **Install & Import Library**<br>Mengatur environment pengembangan dengan menginstal dependensi yang dibutuhkan seperti Ultralytics, OpenCV, dan Pandas. Tahap ini memastikan semua fungsi dan arsitektur model siap digunakan dalam pipeline. |
-| **2** | **Download Dataset dari Roboflow**<br>Dataset citra katarak diunduh langsung dari platform Roboflow menggunakan API ke dalam penyimpanan lokal. Struktur direktori dataset awal otomatis terbuat untuk diproses lebih lanjut. |
-| **3** | **Exploratory Data Analysis (EDA)**<br>Melakukan eksplorasi data untuk memahami distribusi kelas, dimensi ukuran citra, dan karakteristik bounding box. Analisis ini sangat krusial untuk menentukan perlakuan pra-pemrosesan data yang tepat. |
-| **4** | **Data Cleaning & Validasi**<br>Memeriksa kelengkapan pasangan gambar dan label untuk menyaring data yang korup atau tidak valid. Proses ini menjamin model hanya akan dilatih menggunakan sampel data yang berkualitas tinggi. |
-| **5** | **Stratified Split (70/20/10)**<br>Membagi dataset secara proporsional menjadi himpunan pelatihan, validasi, dan pengujian. Metode stratified digunakan agar rasio kelas katarak dan normal selalu seimbang di setiap partisinya. |
-| **6** | **Restrukturisasi Folder YOLOv8**<br>Menyusun ulang struktur folder penyimpanan dataset sesuai dengan standar hirarki yang diwajibkan oleh framework YOLOv8. Gambar dan label didistribusikan ke direktori masing-masing secara terstruktur. |
-| **7** | **Generate `data.yaml`**<br>Membuat file konfigurasi utama yang memuat jalur absolut menuju direktori dataset beserta definisi jumlah dan nama kelas. File ini akan dibaca secara otomatis oleh YOLOv8 saat memulai pelatihan. |
-| **8** | **Training Model YOLOv8**<br>Melatih model dasar YOLOv8 menggunakan data latih untuk mengenali pola dan fitur penyakit katarak secara iteratif. Proses optimasi bobot model ini difasilitasi oleh akselerasi perangkat keras GPU. |
-| **9** | **Evaluasi & Analisis Performa**<br>Mengukur kinerja model yang telah dilatih menggunakan data validasi dan data pengujian yang belum pernah dikenali sebelumnya. Model diuji agar tidak mengalami overfitting menggunakan metrik seperti Precision, Recall, dan mAP. |
-| **10**| **Visualisasi Hasil Prediksi**<br>Menampilkan gambar sampel beserta prediksi bounding box yang dihasilkan oleh model secara langsung. Langkah ini berfungsi sebagai uji kualitatif untuk memastikan model melokalisasi area katarak dengan logis. |
-| **11**| **Deploy ke Web App SiCASA**<br>Mengintegrasikan bobot model terbaik (`best.pt`) ke dalam antarmuka aplikasi web berbasis Python. Hal ini menghubungkan model ke ranah produksi agar pengguna bisa mengunggah gambar dan melihat prediksi deteksi secara langsung. |
+DEDIKAT (Deteksi Dini Katarak) adalah sistem kecerdasan buatan (*Artificial Intelligence*) medis terpadu yang dirancang untuk melakukan penapisan awal (*screening*) dan lokalisasi spasial kekeruhan lensa mata (katarak) secara otomatis melalui analisis citra digital. Proyek ini mengintegrasikan dua pendekatan *deep learning* utama, yaitu algoritma **YOLOv8s** untuk lokalisasi objek patologis (*object detection* dengan *bounding box*) dan arsitektur **ResNet-50** untuk klasifikasi citra medis *end-to-end* tingkat tinggi. Dilengkapi dengan antarmuka berbasis web Flask kustom (premium dengan efek *before/after slider* klinis dan cetak laporan PDF otomatis) serta alternatif dasbor interaktif berbasis Streamlit, DEDIKAT bertujuan membantu para praktisi medis di daerah satelit melakukan skrining katarak secara efisien, akurat, dan transparan melalui integrasi teknologi *Explainable AI* (Grad-CAM, LIME, dan Saliency Maps).
 
 ---
 
-> **Catatan Riset:**  
-> Seluruh pipeline ini dirancang agar **reproducible** (`seed=42`).  
-> Stratified split memastikan distribusi kelas proporsional di setiap partisi.  
-> Early stopping (`patience=20`) digunakan untuk mencegah overfitting selama masa pelatihan.
+## 📊 Dataset & Eksplorasi Data
+
+Proyek DEDIKAT dikembangkan menggunakan dataset **Cataract Eye Data** yang bersumber dari platform Kaggle:
+* **Tautan Dataset**: [Kaggle - Cataract Eye Data by suyog17](https://www.kaggle.com/datasets/suyog17/cataracteyedata)
+* **Penjelasan Dataset**:
+  Dataset ini berisi kumpulan gambar mata berkualitas tinggi yang terbagi menjadi dua kelas utama secara seimbang:
+  1. **Cataract (Mata Positif Katarak)**: Menampilkan citra mata dengan tingkat kekeruhan patologis yang bervariasi pada bagian lensa pupil.
+  2. **Normal (Mata Sehat)**: Menampilkan kondisi mata sehat dengan lensa pupil yang jernih dan bebas dari tanda-tanda opasitas.
+  Dataset ini digunakan untuk melatih model deteksi objek (anotasi bounding box melokalisasi area pupil katarak) serta model klasifikasi citra digital guna membedakan karakteristik mata sehat vs katarak.
+
+---
+
+## 🚀 Fitur & Inovasi Utama
+
+* **Sistem Deteksi Ganda (YOLOv8s & ResNet-50)**: Penggabungan kemampuan lokalisasi lesi spasial (YOLOv8s) dan klasifikasi kategori *end-to-end* yang kuat (ResNet-50).
+* **Interactive Before/After Slider**: Fitur penggeser vertikal responsif di halaman web untuk membandingkan secara langsung antara citra mata asli masukan pasien dan anotasi bounding box AI.
+* **Cetak Laporan Medis Instan (Print Clinical PDF)**: Menyediakan tombol cetak otomatis yang memformat halaman web menjadi bentuk dokumen laporan diagnosis klinis resmi lengkap dengan tabel koordinat, diagram temuan, rekomendasi medis, dan lembar tanda tangan dokter penanggung jawab.
+* **Explainable AI (XAI)**: Visualisasi tingkat transparansi model menggunakan **Grad-CAM**, **LIME**, **Saliency Maps**, serta proyeksi ruang fitur **PCA** dan **t-SNE** untuk memverifikasi keputusan AI berdasarkan bukti klinis secara ilmiah.
+* **Hardware & Status Monitoring**: Widget pemantau real-time untuk mengecek server Flask lokal serta status penggunaan akselerasi perangkat keras GPU CUDA (seperti NVIDIA GeForce RTX 3050) vs CPU Mode.
+
+---
+
+## ⚙️ Pipeline Sistem
+
+Alur pemrosesan data (pipeline) dalam aplikasi DEDIKAT dirancang secara sistematis dengan langkah-langkah berikut:
+
+```mermaid
+graph TD
+    A["1. Input Citra Mata (Frontal)"] --> B["2. Pra-pemrosesan & Resizing (640x640)"]
+    B --> C["3. Inferensi YOLOv8s & ResNet-50"]
+    C --> D{"4. Klasifikasi Kelas"}
+    D -- Cataract --> E["5. Lokalisasi Bounding Box & Status Positif"]
+    D -- Normal --> F["6. Penapisan Normal & Status Negatif"]
+    E --> G["7. Visualisasi (Slider & XAI)"]
+    F --> G
+    G --> H["8. Cetak Laporan Medis PDF"]
+```
+
+1. **Akuisisi Citra Masukan**: Pengguna mengunggah gambar mata (tampak depan/frontal) secara seret-lepas (*drag-and-drop*) atau menggunakan galeri tombol contoh medis katarak/normal.
+2. **Pra-pemrosesan & Penyelarasan**: Gambar dibersihkan dari noise, disesuaikan kontrasnya, dan diubah dimensinya secara otomatis ke ukuran standar $640 \times 640$ piksel sebagai syarat input neural network.
+3. **Inference Deep Learning**: Citra dikirim ke model YOLOv8s (melalui pustaka PyTorch) untuk memprediksi probabilitas kelas dan koordinat spasial bounding box.
+4. **Penyaringan Hasil Logika (Penyelarasan Diagnosis)**: Sistem secara cerdas menyaring jenis deteksi. Jika hanya ditemukan deteksi kelas `Normal` (atau tanpa deteksi), status diagnosis bernilai **Negatif Katarak**. Jika ditemukan deteksi kelas `Cataract`, status didiagnosis sebagai **Positif Katarak**.
+5. **Rendering Output & XAI**: Web menampilkan Before/After Slider interaktif, waktu proses, serta peta aktivasi Grad-CAM/LIME.
+6. **Ekspor Hasil Laporan**: Pengguna dapat mencetak hasil diagnosis ke printer fisik atau menyimpannya sebagai berkas klinis berformat PDF.
+
+---
+
+## 📂 Repository Layout
+
+Susunan folder dan file di dalam repositori GitHub ini telah dirapikan agar memenuhi standar struktur proyek rekayasa perangkat lunak profesional:
+
+```text
+├── app/
+│   ├── app.py                  # Backend Flask Server (Logika Router & API Deteksi)
+│   ├── best.pt                 # File Bobot Model YOLOv8s (Object Detection)
+│   ├── resnet50_best.pth       # File Bobot Model ResNet-50 (Image Classification)
+│   ├── templates/
+│   │   └── index.html          # File Web Template Utama Flask (Bebas emoji, responsif)
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── style.css       # Lembar Gaya CSS (Skema Warna Medis Biru-Putih)
+│   │   ├── js/
+│   │   │   └── main.js         # Logika JS (Tab, Counter, Slider, dan AJAX)
+│   │   └── images/             # Gambar riset (EDA, XAI, Curves)
+│   │       └── samples/        # Contoh citra klinis katarak & normal untuk uji cepat
+│   ├── copy_assets.py          # Utilitas untuk memindahkan gambar visualisasi riset
+│   └── copy_samples.py         # Utilitas untuk memindahkan citra contoh uji
+├── .streamlit/
+│   └── config.toml             # Berkas konfigurasi tema warna Streamlit (Light Mode)
+├── docs/
+│   └── screenshots/            # Berkas gambar dokumentasi web untuk README.md
+├── .gitignore                  # Berkas pengecualian Git (Mengabaikan file sampah & venv)
+├── requirements.txt            # Berkas daftar dependensi pustaka Python
+├── README.md                   # Dokumentasi repositori proyek DEDIKAT (Berkas ini)
+├── streamlit_app.py            # Berkas alternatif web berbasis Streamlit (Deployment Ready)
+├── train.ipynb                 # Jupyter Notebook proses pelatihan YOLOv8
+├── train_resnet50.ipynb        # Jupyter Notebook proses pelatihan ResNet-50
+└── train_resnet50.py           # Skrip pendukung proses pelatihan ResNet-50
+```
+
+---
+
+## 🛠️ Cara Instalasi
+
+### Catatan Penting Dependensi (*Dependencies Note*)
+Proyek ini membutuhkan pustaka pengolahan citra medis (**OpenCV-Python** dan **Pillow**) serta kerangka kerja deep learning (**PyTorch** dan **Ultralytics**). Jika Anda menggunakan Windows, pastikan driver GPU CUDA telah terinstal jika ingin mengaktifkan akselerasi kartu grafis NVIDIA Anda.
+
+Pilihlah salah satu opsi pemasangan di bawah ini:
+
+### Opsi A: Menggunakan PIP (Python Package Installer)
+Jalankan perintah ini di dalam PowerShell atau Command Prompt Anda:
+
+1. Buat dan aktifkan virtual environment (sangat direkomendasikan):
+   ```bash
+   python -m venv venv
+   # Mengaktifkan di Windows
+   .\venv\Scripts\Activate.ps1
+   # Mengaktifkan di Linux/macOS
+   source venv/bin/activate
+   ```
+2. Pasang semua pustaka yang dibutuhkan:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Opsi B: Menggunakan Conda (Anaconda / Miniconda)
+Jika Anda menggunakan lingkungan Conda (sangat disarankan untuk pengguna kartu grafis GPU):
+
+1. Buat environment baru dengan Python versi 3.10:
+   ```bash
+   conda create -n sicasa_gpu python=3.10 -y
+   conda activate sicasa_gpu
+   ```
+2. Pasang PyTorch berkemampuan CUDA (contoh untuk CUDA 11.8):
+   ```bash
+   conda install pytorch torchvision pytorch-cuda=11.8 -c pytorch -c nvidia -y
+   ```
+3. Pasang dependensi lainnya:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+---
+
+## 🏃 Running the Pipeline (CLI)
+
+Gunakan baris perintah berikut untuk menjalankan aplikasi DEDIKAT secara lokal di komputer Anda:
+
+### 1. Menjalankan Versi Flask (Tampilan Premium & Custom)
+Jalankan file server utama Flask:
+```bash
+python app/app.py
+```
+Setelah server aktif, buka web browser Anda dan akses tautan berikut:
+**[http://localhost:5000](http://localhost:5000)**
+
+### 2. Menjalankan Versi Streamlit (Dasbor Alternatif)
+Jalankan file Streamlit menggunakan perintah berikut:
+```bash
+python -m streamlit run streamlit_app.py
+```
+Aplikasi akan otomatis terbuka pada halaman browser baru di alamat:
+**[http://localhost:8501](http://localhost:8501)**
+
+---
+
+## 🖼️ Tampilan Aplikasi (Screenshots)
+
+*Catatan: Pastikan Anda telah menyalin berkas gambar dokumentasi hasil tangkapan layar ke folder `docs/screenshots/` agar gambar di bawah ini tampil di halaman GitHub Anda.*
+
+### 1. Halaman Awal Web DEDIKAT
+Menampilkan tata letak bersih bertema warna biru-putih Drone.io dengan tab demonstrasi model yang rapi.
+![Halaman Awal Web](docs/screenshots/halaman_awal.png)
+
+### 2. Hasil Deteksi Bounding Box YOLOv8s & Slider Perbandingan
+Menampilkan demo hasil deteksi katarak lengkap dengan status diagnosis medis dan Before/After slider.
+![Hasil Deteksi](docs/screenshots/hasil_deteksi.png)
+
+### 3. Dashboard Exploratory Data Analysis (EDA)
+Menampilkan grafik sebaran kelas dataset seimbang, dimensi piksel, dan letak spasial bounding box.
+![Dashboard EDA](docs/screenshots/dashboard_eda.png)
+
+### 4. Evaluasi & Perbandingan Model
+Menampilkan tabel metrik performa model, Confusion Matrix, kurva ROC, dan kurva Loss pelatihan.
+![Evaluasi Model](docs/screenshots/evaluasi_model.png)
+
+### 5. Visualisasi Interpretasi Hasil (Explainable AI)
+Menampilkan peta Grad-CAM, interpretasi piksel LIME, Saliency Maps, serta reduksi dimensi t-SNE.
+![Interpretasi Hasil](docs/screenshots/interpretasi_hasil.png)
+
+---
+
+## 🧱 Teknologi yang Digunakan
+
+* **Backend Framework**: Flask (Python)
+* **Frontend Framework / UI**: Vanilla HTML5, CSS3 (Premium Glassmorphism), dan JavaScript ES6 (Custom Slider & counter)
+* **Dasbor Alternatif**: Streamlit (Python)
+* **Model Deep Learning**: YOLOv8s (Ultralytics) dan ResNet-50 (PyTorch)
+* **Computer Vision**: OpenCV (CV2) dan Pillow (PIL)
+* **Analisis & Eksplorasi Data**: NumPy, Pandas, Matplotlib, Seaborn, Scikit-learn
+* **Akselerasi Perangkat Keras**: NVIDIA CUDA Toolkit & PyTorch GPU
+* **Manajemen Repositori**: Git & GitHub
