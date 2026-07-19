@@ -150,8 +150,6 @@ Aplikasi secara otomatis akan terbuka di browser Anda melalui **[http://localhos
 
 ## Dokumentasi Antarmuka Pengguna
 
-*Catatan: Pastikan Anda telah menyalin berkas gambar dokumentasi hasil tangkapan layar ke folder `docs/screenshots/` agar gambar di bawah ini tampil di halaman GitHub Anda.*
-
 ### 1. Halaman Awal Web DEDIKAT
 Menampilkan tata letak bersih bertema warna biru-putih Drone.io dengan tab demonstrasi model yang rapi.
 ![Halaman Awal Web](docs/screenshots/halaman_awal.png)
