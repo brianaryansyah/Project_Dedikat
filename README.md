@@ -19,7 +19,7 @@ DEDIKAT (Deteksi Dini Katarak) adalah sistem kecerdasan buatan (*Artificial Inte
 Proyek DEDIKAT dikembangkan menggunakan dataset **Cataract Eye Data** yang bersumber dari platform Kaggle:
 * **Tautan Dataset**: [Kaggle - Cataract Eye Data by suyog17](https://www.kaggle.com/datasets/suyog17/cataracteyedata)
 * **Penjelasan Dataset**:
-  Dataset ini berisi kumpulan gambar mata berkualitas tinggi yang terbagi menjadi dua kelas utama secara seimbang:
+  Dataset ini berisi kumpulan gambar mata berkualitas tingi yang terbagi menjadi dua kelas utama secara seimbang:
   1. **Cataract (Mata Positif Katarak)**: Menampilkan citra mata dengan tingkat kekeruhan patologis yang bervariasi pada bagian lensa pupil.
   2. **Normal (Mata Sehat)**: Menampilkan kondisi mata sehat dengan lensa pupil yang jernih dan bebas dari tanda-tanda opasitas.
   Dataset ini digunakan untuk melatih model deteksi objek (anotasi bounding box melokalisasi area pupil katarak) serta model klasifikasi citra digital guna membedakan karakteristik mata sehat vs katarak.
@@ -58,33 +58,6 @@ graph TD
 4. **Penyaringan Hasil Logika (Penyelarasan Diagnosis)**: Sistem secara cerdas menyaring jenis deteksi. Jika hanya ditemukan deteksi kelas `Normal` (atau tanpa deteksi), status diagnosis bernilai **Negatif Katarak**. Jika ditemukan deteksi kelas `Cataract`, status didiagnosis sebagai **Positif Katarak**.
 5. **Rendering Output & XAI**: Web menampilkan Before/After Slider interaktif, waktu proses, serta peta aktivasi Grad-CAM/LIME.
 6. **Ekspor Hasil Laporan**: Pengguna dapat mencetak hasil diagnosis ke printer fisik atau menyimpannya sebagai berkas klinis berformat PDF.
-
----
-
-## 📈 Analisis Performa & Kurva Pelatihan Model
-
-Pengembangan DEDIKAT melibatkan pemantauan metrik evaluasi secara ketat selama pelatihan model deep learning guna menjamin akurasi diagnosis medis yang aman bagi pasien:
-
-### 1. Kurva Pelatihan & Loss YOLOv8s
-![Kurva Latih YOLOv8s](app/static/images/eval_yolov8_training.png)
-* **Analisis**: Kurva *Loss* lokalisasi kotak pembatas (*box_loss*) dan klasifikasi (*cls_loss*) pada set pelatihan maupun validasi menunjukkan penurunan yang konvergen dan stabil hingga epoch 130. Model berhasil mencapai nilai **mAP50** sebesar **96.83%**, mengindikasikan sensitivitas dan akurasi pelokalisasian pupil mata yang mengalami katarak sangat presisi.
-
-### 2. Kurva Pelatihan ResNet-50
-![Kurva Latih ResNet-50](app/static/images/eval_resnet_training.png)
-* **Analisis**: Model klasifikasi gambar *end-to-end* ResNet-50 dilatih dan dipantau tingkat keakuratannya. Kurva menunjukkan laju *Accuracy* validasi melonjak cepat hingga menstabilkan diri pada akurasi puncak sebesar **98.73%**. Tingkat *Cross-Entropy Loss* yang terus menurun mendekati angka nol membuktikan model memiliki pemahaman klasifikasi visual yang optimal dan bebas dari tanda-tanda *overfitting*.
-
-### 3. Confusion Matrix (ResNet-50)
-![Confusion Matrix ResNet-50](app/static/images/eval_confusion_matrix.png)
-* **Analisis**: Confusion Matrix memperlihatkan performa luar biasa dalam memisahkan kelas normal dan katarak. Jumlah prediksi benar (True Positive dan True Negative) mendominasi secara signifikan, dengan tingkat kesalahan *False Negative* (pasien katarak yang terdiagnosis normal) yang mendekati nol. Hal ini sangat krusial dalam domain diagnosis medis untuk mencegah kesalahan kelalaian penanganan klinis.
-
-### 4. Kurva ROC (Receiver Operating Characteristic) & Precision-Recall (PR)
-![Kurva ROC](app/static/images/eval_roc_curve.png)
-![Kurva Precision-Recall](app/static/images/eval_pr_curve.png)
-* **Analisis**: Kurva ROC menunjukkan nilai **Area Under Curve (AUC)** mencapai **99.73%** untuk model ResNet-50, membuktikan performa pembeda kelas yang sangat unggul di berbagai ambang batas klasifikasi. Ditambah dengan kurva Precision-Recall yang melengkung tajam ke arah kanan atas, ini membuktikan model tetap mempertahankan tingkat kebenaran deteksi yang tinggi (Precision) meskipun sensitivitas penemuan objek (Recall) dipaksa ke tingkat maksimum.
-
-### 5. Analisis Tingkat Penting Fitur (Random Forest Feature Importance)
-![Feature Importance Random Forest](app/static/images/eval_rf_feature_importance.png)
-* **Analisis**: Grafik ini memetakan kontribusi fitur citra yang diekstraksi terhadap keputusan model ensembel Random Forest. Fitur intensitas warna dan tekstur kelabu di area spasial tengah (pupil) terbukti memiliki signifikansi kontribusi tertinggi. Hal ini membuktikan keputusan pengelompokan status katarak oleh kecerdasan buatan didasarkan pada perubahan opasitas kelensa pupil secara biologis, bukan bias latar belakang gambar.
 
 ---
 
@@ -227,3 +200,30 @@ Menampilkan peta Grad-CAM, interpretasi piksel LIME, Saliency Maps, serta reduks
 * **Analisis & Eksplorasi Data**: NumPy, Pandas, Matplotlib, Seaborn, Scikit-learn
 * **Akselerasi Perangkat Keras**: NVIDIA CUDA Toolkit & PyTorch GPU
 * **Manajemen Repositori**: Git & GitHub
+
+---
+
+## 📈 Analisis Performa & Kurva Pelatihan Model
+
+Pengembangan DEDIKAT melibatkan pemantauan metrik evaluasi secara ketat selama pelatihan model deep learning guna menjamin akurasi diagnosis medis yang aman bagi pasien:
+
+### 1. Kurva Pelatihan & Loss YOLOv8s
+![Kurva Latih YOLOv8s](app/static/images/eval_yolov8_training.png)
+* **Analisis**: Kurva *Loss* lokalisasi kotak pembatas (*box_loss*) dan klasifikasi (*cls_loss*) pada set pelatihan maupun validasi menunjukkan penurunan yang konvergen dan stabil hingga epoch 130. Model berhasil mencapai nilai **mAP50** sebesar **96.83%**, mengindikasikan sensitivitas dan akurasi pelokalisasian pupil mata yang mengalami katarak sangat presisi.
+
+### 2. Kurva Pelatihan ResNet-50
+![Kurva Latih ResNet-50](app/static/images/eval_resnet_training.png)
+* **Analisis**: Model klasifikasi gambar *end-to-end* ResNet-50 dilatih dan dipantau tingkat keakuratannya. Kurva menunjukkan laju *Accuracy* validasi melonjak cepat hingga menstabilkan diri pada akurasi puncak sebesar **98.73%**. Tingkat *Cross-Entropy Loss* yang terus menurun mendekati angka nol membuktikan model memiliki pemahaman klasifikasi visual yang optimal dan bebas dari tanda-tanda *overfitting*.
+
+### 3. Confusion Matrix (ResNet-50)
+![Confusion Matrix ResNet-50](app/static/images/eval_confusion_matrix.png)
+* **Analisis**: Confusion Matrix memperlihatkan performa luar biasa dalam memisahkan kelas normal dan katarak. Jumlah prediksi benar (True Positive dan True Negative) mendominasi secara signifikan, dengan tingkat kesalahan *False Negative* (pasien katarak yang terdiagnosis normal) yang mendekati nol. Hal ini sangat krusial dalam domain diagnosis medis untuk mencegah kesalahan kelalaian penanganan klinis.
+
+### 4. Kurva ROC (Receiver Operating Characteristic) & Precision-Recall (PR)
+![Kurva ROC](app/static/images/eval_roc_curve.png)
+![Kurva Precision-Recall](app/static/images/eval_pr_curve.png)
+* **Analisis**: Kurva ROC menunjukkan nilai **Area Under Curve (AUC)** mencapai **99.73%** untuk model ResNet-50, membuktikan performa pembeda kelas yang sangat unggul di berbagai ambang batas klasifikasi. Ditambah dengan kurva Precision-Recall yang melengkung tajam ke arah kanan atas, ini membuktikan model tetap mempertahankan tingkat kebenaran deteksi yang tinggi (Precision) meskipun sensitivitas penemuan objek (Recall) dipaksa ke tingkat maksimum.
+
+### 5. Analisis Tingkat Penting Fitur (Random Forest Feature Importance)
+![Feature Importance Random Forest](app/static/images/eval_rf_feature_importance.png)
+* **Analisis**: Grafik ini memetakan kontribusi fitur citra yang diekstraksi terhadap keputusan model ensembel Random Forest. Fitur intensitas warna dan tekstur kelabu di area spasial tengah (pupil) terbukti memiliki signifikansi kontribusi tertinggi. Hal ini membuktikan keputusan pengelompokan status katarak oleh kecerdasan buatan didasarkan pada perubahan opasitas kelensa pupil secara biologis, bukan bias latar belakang gambar.
